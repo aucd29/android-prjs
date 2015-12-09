@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">APK Extractor</string>
+    <string name="plsWait">Please wait..</string>
+    <string name="appName">&lt;b&gt;APK&lt;/b&gt; Extractor</string>
+    <string name="downloadPath">Download path</string>
+    <string name="dev">Developer</string>
+    <string name="extractOk">Extract OK!</string>
+    <string name="sdcard">sd</string>
+    <string name="delete">Delete</string>
+    <string name="email">E-mail</string>
+    <string name="dlgEmail">E-Mail : </string>
+    <string name="errorEmail">There are no email clients installed.</string>
+    <string name="sendMailFail">Please check network</string>
+    <string name="regAddr">Registered Address</string>
+    <string name="save">Save</string>
+    <string name="emptyList">Could not find a App</string>
+    
+    <!-- dlg order by  -->
+    <string name="sortDefault">Default</string>
+    <string name="alphabetAsc">Alphabet (ASC)</string>
+    <string name="alphabetDesc">Alphabet (DESC)</string>
+    <string name="firstInstallTime">First Install Time</string>
+    <string name="lastInstallTime">Last Install Time</string>
+    
+    <!-- MENU -->
+    <string name="mnu_email">Set E-mail Addr</string>
+    <string name="mnu_search">Search</string>
+    <string name="mnu_showAllApps">Show All Apps</string>
+    <string name="mnu_showInstalledApps">Show Installed Apps</string>
+    <string name="mnu_setSdPath">Set SD Path</string>
+    <string name="mnu_specialThanks">Special Thanks</string>
+    <string name="mnu_license">License</string>
+    <string name="mnu_sortBy">Sort By</string>
+</resources>
