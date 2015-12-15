@@ -28,7 +28,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
 
-    compile 'com.github.aucd29:common:1.0.1'
+    compile 'com.github.aucd29:common:1.0.2'
     compile 'com.github.aucd29:ui:1.0.1'
     compile 'com.github.aucd29:ani:1.0.1'
     compile 'com.github.aucd29:explorer:1.0.0'

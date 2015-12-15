@@ -67,7 +67,6 @@
             android:id="@+id/sdProgressBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            style="@style/tallerBarStyle"
             android:minHeight="20dp"
             android:maxHeight="20dp"
             android:visibility="gone" />

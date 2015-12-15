@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -21,6 +22,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -157,18 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initMenu();
         initSearch();
         initData(true);
-
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
     }
 
     @Override
@@ -510,7 +501,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mDlg.setCancelable(false);
         mDlg.setMessage(getString(R.string.plsWait));
         mDlg.show();
-        mDlg.setContentView(R.layout.dlg_progress);
+
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            mDlg.setContentView(R.layout.dlg_progress);
+        }
     }
 
     private void initListView() {
@@ -537,14 +531,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     File src = new File(info.srcDir);
 
-                    String fileName = BkString.getFileName(info.srcDir);
-                    int pos = fileName.lastIndexOf("-");
-                    if (pos != -1) {
-                        fileName = fileName.substring(0, pos);
-                        fileName += "-" + info.versionName + ".apk";
-                    } else {
-                        fileName = fileName.replace(".apk", "-" + info.versionName + ".apk");
-                    }
+//                    String fileName = BkString.getFileName(info.srcDir);
+                    String fileName = info.appName;
+                    fileName += "-";
+                    fileName += info.versionName;
+                    fileName += ".apk";
+
+//                    int pos = fileName.lastIndexOf("-");
+//                    if (pos != -1) {
+//                        fileName = fileName.substring(0, pos);
+//                        fileName += "-" + info.versionName + ".apk";
+//                    } else {
+//                        fileName = fileName.replace(".apk", "-" + info.versionName + ".apk");
+//                    }
 
                     BkFile.copyFileTo(src, Cfg.getDownPath(MainActivity.this) + fileName, new BkFile.FileCopyDetailListener() {
                         long fileSize;
@@ -777,6 +776,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // View.OnClickListener
     //
     ////////////////////////////////////////////////////////////////////////////////////
+
+//    static class FadeStatusBar {
+//        public static void start(Context context, int before, int end) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                Window window = context.getWindow();
+//                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                window.setStatusBarColor(Color.BLUE);
+//            }
+//        }
+//    }
 
     @Override
     public void onClick(View v) {
