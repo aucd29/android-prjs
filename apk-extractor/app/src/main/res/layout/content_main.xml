@@ -14,14 +14,14 @@
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@color/dBg" >
+        android:background="@color/dBg">
 
         <net.sarangnamu.common.fonts.RobotoLightTextView
             android:id="@+id/title"
             style="@style/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            android:layout_centerInParent="true"/>
 
         <net.sarangnamu.common.fonts.RobotoLightTextView
             android:id="@+id/tvSearch"
@@ -32,7 +32,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="5dp"
             android:text="@string/mnu_search"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <EditText
             android:id="@+id/search"
@@ -46,7 +46,7 @@
             android:ems="10"
             android:hint=""
             android:singleLine="true"
-            android:visibility="gone" />
+            android:visibility="gone"/>
 
         <ImageButton
             android:id="@+id/menu"
@@ -55,21 +55,22 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:background="@drawable/btn_bgcolor_selector"
-            android:src="@drawable/icon_menu" />
+            android:src="@drawable/icon_menu"/>
     </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="#d9d9d9" >
+        android:background="#d9d9d9">
 
         <ProgressBar
             android:id="@+id/sdProgressBar"
+            style="@style/tallerBarStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:minHeight="20dp"
             android:maxHeight="20dp"
-            android:visibility="gone" />
+            android:minHeight="20dp"
+            android:visibility="gone"/>
 
         <net.sarangnamu.common.fonts.RobotoLightTextView
             android:id="@+id/dev"
@@ -78,7 +79,7 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="4dp"
             android:gravity="center_vertical"
-            android:text="@string/dev" />
+            android:text="@string/dev"/>
 
         <net.sarangnamu.common.fonts.RobotoLightTextView
             android:id="@+id/path"
@@ -89,7 +90,7 @@
             android:layout_marginRight="4dp"
             android:gravity="right|center_vertical"
             android:maxWidth="260dp"
-            android:singleLine="true" />
+            android:singleLine="true"/>
 
     </FrameLayout>
 
@@ -105,8 +106,8 @@
         android:id="@android:id/empty"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="center|center_vertical"
         android:layout_gravity="center|center_vertical"
+        android:gravity="center|center_vertical"
         android:singleLine="true"
-        android:text="@string/emptyList" />
+        android:text="@string/emptyList"/>
 </LinearLayout>
