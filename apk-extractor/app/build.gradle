@@ -1,14 +1,6 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        config {
-            storeFile file('/Users/aucd29/prj/burke.choi.keystore')
-            keyAlias 'burke.choi'
-            keyPassword 'redmoon29'
-            storePassword 'redmoon29'
-        }
-    }
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {
