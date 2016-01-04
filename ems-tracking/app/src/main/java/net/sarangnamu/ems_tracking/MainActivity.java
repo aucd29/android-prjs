@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -83,13 +84,13 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAddBtn         = (Button) findViewById(R.id.add);
+        mAddBtn      = (Button) findViewById(R.id.add);
         mTitle       = (TextView) findViewById(R.id.title);
         mEmpty       = (TextView) findViewById(android.R.id.empty);
         mEmsNum      = (EditText) findViewById(R.id.emsNum);
         mAnotherName = (EditText) findViewById(R.id.anotherName);
         mEditLayout  = (RelativeLayout) findViewById(R.id.editLayout);
-        mRefreshBtn     = (ImageButton) findViewById(R.id.refersh);
+        mRefreshBtn  = (ImageButton) findViewById(R.id.refersh);
 
         initLabel();
         initData();
@@ -104,12 +105,12 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
                 if (num == null || num.length() < 1) {
                     showPopup(getString(R.string.plsInputNum));
-                    return ;
+                    return;
                 }
 
                 if (!Cfg.isEmsNumber(num)) {
                     showPopup(getString(R.string.invalidEmsNum));
-                    return ;
+                    return;
                 }
 
                 trackingAndInsertDB(num);
@@ -135,39 +136,9 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             public void afterTextChanged(Editable arg0) {
                 int height;
                 if (mEmsNum.getText().length() == 0) {
-                    height = (int) getResources().getDimension(R.dimen.emsLayoutMinHeight);
-                    Resize.height(mEditLayout, height, new ResizeAnimationListener() {
-                        @Override
-                        public void onAnimationEnd() {
-                            mExpandLayoutId = false;
-                        }
-
-                        @Override
-                        public void onAnimationStart() {
-                            mAnotherName.setVisibility(View.GONE);
-                        }
-                    });
+                    hideAnotherName();
                 } else {
-                    if (mExpandLayoutId) {
-                        return ;
-                    }
-
-                    mExpandLayoutId = true;
-                    height = (int) getResources().getDimension(R.dimen.emsLayoutMaxHeight);
-                    Resize.height(mEditLayout, height, new ResizeAnimationListener() {
-                        @Override
-                        public void onAnimationEnd() {
-                            if (mModifyId == -1) {
-                                mAnotherName.setText("");
-                            }
-                            mAnotherName.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationStart() {
-
-                        }
-                    });
+                    showAnotherName();
                 }
             }
         });
@@ -176,6 +147,46 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
         //        getWindow().setSoftInputMode(
         //                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    private void showAnotherName() {
+        if (mExpandLayoutId) {
+            return ;
+        }
+
+        mExpandLayoutId = true;
+
+        int height = (int) getResources().getDimension(R.dimen.emsLayoutMaxHeight);
+        Resize.height(mEditLayout, height, new ResizeAnimationListener() {
+            @Override
+            public void onAnimationEnd() {
+                if (mModifyId == -1) {
+                    mAnotherName.setText("");
+                }
+
+                mAnotherName.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationStart() {
+
+            }
+        });
+    }
+
+    private void hideAnotherName() {
+        int height = (int) getResources().getDimension(R.dimen.emsLayoutMinHeight);
+        Resize.height(mEditLayout, height, new ResizeAnimationListener() {
+            @Override
+            public void onAnimationEnd() {
+                mExpandLayoutId = false;
+            }
+
+            @Override
+            public void onAnimationStart() {
+                mAnotherName.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void trackingAndInsertDB(final String num) {
@@ -261,6 +272,18 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         return super.onMenuItemSelected(featureId, item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mAnotherName != null && mAnotherName.getVisibility() == View.VISIBLE) {
+            hideAnotherName();
+
+            mModifyId = -1;
+            ((Button)findViewById(R.id.add)).setText(R.string.add);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void initData() {
         DbManager.getInstance().open(this, new EmsDbHelper(this));
         loadEmsData();
@@ -313,7 +336,10 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         mDlg.setCancelable(false);
         mDlg.setMessage(getString(R.string.plsWait));
         mDlg.show();
-        mDlg.setContentView(R.layout.dlg_progress);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            mDlg.setContentView(R.layout.dlg_progress);
+        }
     }
 
     public void hideProgress() {
@@ -523,17 +549,6 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 mAddBtn.setText(R.string.modify);
 
                 mModifyId = typeObj.id;
-
-                //                DlgAnotherName dlg = new DlgAnotherName(MainActivity.this, num, anotherName);
-                //                dlg.setOnDismissListener(new OnDismissListener() {
-                //                    @Override
-                //                    public void onDismiss(DialogInterface dialog) {
-                //                        if (adapter != null) {
-                //                            adapter.notifyDataSetChanged();
-                //                        }
-                //                    }
-                //                });
-                //                dlg.show();
             }
         }
     }
