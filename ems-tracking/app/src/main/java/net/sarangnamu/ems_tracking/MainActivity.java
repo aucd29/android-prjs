@@ -24,7 +24,6 @@ import net.sarangnamu.common.ani.Resize;
 import net.sarangnamu.common.ani.Resize.ResizeAnimationListener;
 import net.sarangnamu.common.fonts.FontLoader;
 import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.common.ui.StatusBar;
 import net.sarangnamu.common.ui.dlg.DlgBtnBase.DlgBtnListener;
 import net.sarangnamu.common.ui.dlg.DlgLicense;
 import net.sarangnamu.common.ui.dlg.DlgNormal;
@@ -68,16 +67,16 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
     private static final int SLIDING_MARGIN = 186;
 
-    private Button mAddBtn;
+    private int mModifyId = -1;
+    private boolean mExpandLayoutId = false;
 
+    private Button mAddBtn;
     private TextView mTitle, mEmpty;
     private EditText mEmsNum, mAnotherName;
     private EmsAdapter mAdapter;
     private ImageButton mRefreshBtn;
     private RelativeLayout mEditLayout;
     private ProgressDialog mDlg;
-    private boolean mExpandLayoutId = false;
-    private int mModifyId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,9 +143,6 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         });
 
         BkCfg.engKeyboard(mEmsNum);
-
-        //        getWindow().setSoftInputMode(
-        //                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     private void showAnotherName() {
@@ -279,6 +275,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
             mModifyId = -1;
             ((Button)findViewById(R.id.add)).setText(R.string.add);
+            ((TextView) findViewById(R.id.emsNum)).setText("");
         } else {
             super.onBackPressed();
         }
