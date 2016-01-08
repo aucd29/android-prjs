@@ -7,7 +7,7 @@ android {
         applicationId "net.sarangnamu.ems_tracking"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 18
+        versionCode 19
         versionName '1.4.0'
         multiDexEnabled true
     }
