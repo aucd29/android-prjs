@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#e73636</color>
+    <color name="colorPrimaryDark">#b42a2a</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="dBg">#f44444</color>
+    <color name="dBgSearch">#6a6a6a</color>
+    <color name="dFont">@android:color/white</color>
+    <color name="dBgList">#ebebeb</color>
+
+    <color name="btnBase">#c9c9c9</color>
+    <color name="btnOver">#b2b2b2</color>
+    <color name="btnBgColorOver">#7fa7a7a7</color>
+</resources>
