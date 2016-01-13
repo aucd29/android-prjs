@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<net.sarangnamu.common.ui.layout.SquareLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center|center_vertical">
+
+    <EditText
+        android:id="@+id/edt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|center_vertical"
+        android:gravity="center|center_vertical"
+         />
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="+"
+        android:layout_gravity="center|center_vertical"
+        android:gravity="center|center_vertical" />
+
+</net.sarangnamu.common.ui.layout.SquareLayout>
