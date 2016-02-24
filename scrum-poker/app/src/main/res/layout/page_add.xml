@@ -23,7 +23,8 @@
         android:id="@+id/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:src="@android:drawable/ic_input_add"/>
 
     <net.sarangnamu.common.ui.grid.edit.EditGridView
         android:id="@+id/grid"

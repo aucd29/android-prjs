@@ -112,7 +112,7 @@ public class EditGridView extends GridView implements View.OnClickListener {
         clearGridData();
         initData();
 
-        if (((BaseAdapter) getAdapter()) != null) {
+        if (getAdapter() != null) {
             ((BaseAdapter) getAdapter()).notifyDataSetChanged();
         }
     }

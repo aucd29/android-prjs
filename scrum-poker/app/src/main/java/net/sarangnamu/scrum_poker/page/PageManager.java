@@ -38,6 +38,10 @@ public class PageManager extends FrgmtManager {
 
     }
 
+    public int getChildCount() {
+        return mFrgmtManager.getBackStackEntryCount();
+    }
+
     @Override
     protected void setTransition(FragmentTransaction trans) {
         setUpTransition(trans);

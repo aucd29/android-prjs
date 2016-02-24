@@ -2,32 +2,26 @@ package net.sarangnamu.scrum_poker;
 
 import java.util.ArrayList;
 
-import net.sarangnamu.common.fonts.FontLoader;
 import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.common.ui.StatusBar;
-import net.sarangnamu.common.ui.dlg.DlgLicense;
-import net.sarangnamu.scrum_poker.cfg.Cfg;
 import net.sarangnamu.scrum_poker.db.DbHelper;
 import net.sarangnamu.scrum_poker.page.PageManager;
 import net.sarangnamu.scrum_poker.page.sub.AddFrgmt;
 import net.sarangnamu.scrum_poker.page.sub.MainFrgmt;
+
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import org.slf4j.Logger;
@@ -36,34 +30,43 @@ import org.slf4j.LoggerFactory;
 public class MainActivity extends AppCompatActivity {
     private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
 
-    private Toolbar toolbar;
-    private ListView leftMenu;
-    private DrawerLayout drawer;
-    private ArrayList<MenuData> menuData;
+    private DrawerLayout mDrawer;
     private FrameLayout contentFrame;
-//    private ActionBarDrawerToggle actionbarToogle;
+    private NavigationView mNaviView;
+    private ArrayList<MenuData> mMenuData;
+    private ActionBarDrawerToggle mToggleActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        leftMenu        = (ListView) findViewById(R.id.leftMenu);
-//        drawer          = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        toolbar         = (Toolbar) findViewById(R.id.toolbar);
-//        contentFrame    = (FrameLayout) findViewById(R.id.content_frame);
+        contentFrame = (FrameLayout) findViewById(R.id.content_frame);
+        mDrawer      = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mNaviView    = (NavigationView) findViewById(R.id.naviView);
 
-//        if (savedInstanceState == null) {
-//            initPageManager();
-//        }
+        if (savedInstanceState == null) {
+            initPageManager();
+        }
 
-//        initDrawer();
-//        initLeftMenu();
+        initDrawer();
+        initFloatingActionButton();
+        initLeftMenu();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        int count = PageManager.getInstance(MainActivity.this).getChildCount();
+        if (count == 1) {
+            setAddButtonAlpha(1);
+        }
+
+        super.onBackPressed();
     }
 
     @Override
@@ -76,17 +79,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initPageManager() {
-//        PageManager.getInstance(this).add(R.id.content_frame, MainFrgmt.class);
+        PageManager.getInstance(this).add(R.id.content_frame, MainFrgmt.class);
     }
 
     private void initDrawer() {
-//        setSupportActionBar(toolbar);
-//
-//        actionbarToogle = new ActionBarDrawerToggle(this, drawer, R.string.app_name, R.string.app_name);
-//        drawer.setDrawerListener(actionbarToogle);
+        mToggleActionBar = new ActionBarDrawerToggle(this, mDrawer, R.string.app_name, R.string.app_name);
 
-//        drawer.setScrimColor(Color.TRANSPARENT);
-//        drawer.setDrawerListener(new ContentSlidingDrawerListener() {
+        mDrawer.setDrawerListener(mToggleActionBar);
+//        mDrawer.setScrimColor(Color.TRANSPARENT);
+//        mDrawer.setDrawerListener(new ContentSlidingDrawerListener() {
 //            @Override
 //            public View getListView() {
 //                return leftMenu;
@@ -102,56 +103,74 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-//        actionbarToogle.syncState();
+        mToggleActionBar.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-//        actionbarToogle.onConfigurationChanged(newConfig);
+        mToggleActionBar.onConfigurationChanged(newConfig);
     }
 
     private void initLeftMenu() {
-        if (menuData == null) {
-            menuData = new ArrayList<MenuData>();
+        if (mMenuData == null) {
+            mMenuData = new ArrayList<MenuData>();
         }
 
-        menuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.app_name)));
-        menuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.add_rule)));
+        mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.app_name)));
+        mMenuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.add_rule)));
 
-        // async ??
         DbManager.getInstance().open(this, new DbHelper(this));
         Cursor cr = DbHelper.select();
         if (cr.getCount() > 0) {
-            menuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.user_rule)));
+            mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.user_rule)));
 
             while (cr.moveToNext()) {
                 MenuData mnuData = new MenuData(LEFT_MENU_TYPE_DB, cr.getString(1));
                 mnuData.primaryKey = cr.getInt(0);
-                menuData.add(mnuData);
+
+                mLog.debug("@@ USER RULE : " + cr.getString(1) + ", (" + cr.getInt(0) + ") " + cr.getString(2));
+
+                mMenuData.add(mnuData);
             }
         }
 
-        menuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.about)));
-        menuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.license)));
+        mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.about)));
+        mMenuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.license)));
 
-        leftMenu.setAdapter(new MenuAdapter());
-        leftMenu.setOnItemClickListener(new OnItemClickListener() {
+//        leftMenu.setAdapter(new MenuAdapter());
+//        leftMenu.setOnItemClickListener(new OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (mMenuData.get(position).menu.equals(getString(R.string.license))) {
+//                    DlgLicense dlg = new DlgLicense(MainActivity.this);
+//                    dlg.setTitleTypeface(FontLoader.getInstance(getApplicationContext()).getRobotoLight());
+//                    dlg.show();
+//                } else if (mMenuData.get(position).menu.equals(getString(R.string.add_rule))) {
+////                    PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class);
+//                } else if (mMenuData.get(position).type == LEFT_MENU_TYPE_DB) {
+//                    Cfg.set(getApplicationContext(), Cfg.DB_ID, mMenuData.get(position).primaryKey + "");
+//                }
+//
+//                mDrawer.closeDrawers();
+//            }
+//        });
+    }
+
+    private void initFloatingActionButton() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (menuData.get(position).menu.equals(getString(R.string.license))) {
-                    DlgLicense dlg = new DlgLicense(MainActivity.this);
-                    dlg.setTitleTypeface(FontLoader.getInstance(getApplicationContext()).getRobotoLight());
-                    dlg.show();
-                } else if (menuData.get(position).menu.equals(getString(R.string.add_rule))) {
-//                    PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class);
-                } else if (menuData.get(position).type == LEFT_MENU_TYPE_DB) {
-                    Cfg.set(getApplicationContext(), Cfg.DB_ID, menuData.get(position).primaryKey + "");
-                }
-
-                drawer.closeDrawers();
+            public void onClick(View view) {
+                setAddButtonAlpha(0);
+                PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class, null);
             }
         });
+    }
+
+    public void setAddButtonAlpha(int value) {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.animate().alpha(value);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -182,11 +201,11 @@ public class MainActivity extends AppCompatActivity {
     class MenuAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            if (menuData == null) {
+            if (mMenuData == null) {
                 return 0;
             }
 
-            return menuData.size();
+            return mMenuData.size();
         }
 
         @Override
@@ -201,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemViewType(int position) {
-            return menuData.get(position).type;
+            return mMenuData.get(position).type;
         }
 
         @Override
@@ -211,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean isEnabled(int position) {
-            if (menuData.get(position).type == LEFT_MENU_TYPE_BAR) {
+            if (mMenuData.get(position).type == LEFT_MENU_TYPE_BAR) {
                 return false;
             }
 
@@ -234,14 +253,14 @@ public class MainActivity extends AppCompatActivity {
                 holder = (MenuViewHolder) convertView.getTag();
             }
 
-            MenuData data = menuData.get(position);
+            MenuData data = mMenuData.get(position);
             holder.menu.setText(data.menu);
 
             return convertView;
         }
 
         private int getInflateId(int position) {
-            switch (menuData.get(position).type) {
+            switch (mMenuData.get(position).type) {
             case LEFT_MENU_TYPE_BAR:
                 return R.layout.page_main_menu_bar;
             default:

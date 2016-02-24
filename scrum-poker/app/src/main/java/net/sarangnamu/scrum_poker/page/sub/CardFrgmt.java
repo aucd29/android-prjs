@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 public class CardFrgmt extends FrgmtBase {
     private TextView value;
-    private BlurView blur;
+//    private BlurView blur;
 
     @Override
     protected int getLayoutId() {
@@ -35,7 +35,7 @@ public class CardFrgmt extends FrgmtBase {
     @Override
     protected void initLayout() {
         value = (TextView) mBaseView.findViewById(R.id.value);
-        blur  = (BlurView) mBaseView.findViewById(R.id.blur);
+//        blur  = (BlurView) mBaseView.findViewById(R.id.blur);
 
         value.setText(getArguments().getString(Cfg.SCRUM_DATA, "ERROR"));
     }

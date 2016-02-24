@@ -1,5 +1,5 @@
 /*
- * MainFrgmt.java
+ * AddFrgmt.java
  * Copyright 2014 Burke Choi All right reserverd.
  *             http://www.sarangnamu.net
  *
@@ -20,6 +20,7 @@ package net.sarangnamu.scrum_poker.page.sub;
 import java.util.ArrayList;
 
 import net.sarangnamu.common.FrgmtBase;
+import net.sarangnamu.common.ui.dlg.DlgTimer;
 import net.sarangnamu.common.ui.grid.edit.EditGridData;
 import net.sarangnamu.common.ui.grid.edit.EditGridView;
 import net.sarangnamu.scrum_poker.R;
@@ -37,10 +38,9 @@ import org.slf4j.LoggerFactory;
 public class AddFrgmt extends FrgmtBase {
     private static final Logger mLog = LoggerFactory.getLogger(AddFrgmt.class);
 
-
-    private EditText edtTitle;
-    private ImageButton submit;
-    private EditGridView grid;
+    private EditText mEdtTitle;
+    private ImageButton mSubmit;
+    private EditGridView mGrid;
 
     @Override
     protected int getLayoutId() {
@@ -49,13 +49,13 @@ public class AddFrgmt extends FrgmtBase {
 
     @Override
     protected void initLayout() {
-    	mBaseView.setPadding(0, dpToPixelInt(Cfg.ACTION_BAR_HEIGHT), 0, 0);
+        mBaseView.setPadding(0, dpToPixelInt(Cfg.ACTION_BAR_HEIGHT), 0, 0);
 
-        edtTitle    = (EditText) mBaseView.findViewById(R.id.edtTitle);
-        submit      = (ImageButton) mBaseView.findViewById(R.id.submit);
-        grid        = (EditGridView) mBaseView.findViewById(R.id.grid);
+        mEdtTitle = (EditText) mBaseView.findViewById(R.id.edtTitle);
+        mSubmit = (ImageButton) mBaseView.findViewById(R.id.submit);
+        mGrid = (EditGridView) mBaseView.findViewById(R.id.grid);
 
-        submit.setOnClickListener(new View.OnClickListener() {
+        mSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mLog.isDebugEnabled()) {
@@ -66,18 +66,18 @@ public class AddFrgmt extends FrgmtBase {
                     mLog.debug(log.toString());
                 }
 
-                if (getString(R.string.license).equals(edtTitle.getText()) ||
-                    getString(R.string.add_rule).equals(edtTitle.getText())) {
-                    String msg = String.format(getActivity().getString(R.string.doNotUseThisWord), edtTitle.getText());
+                if (getString(R.string.license).equals(mEdtTitle.getText()) ||
+                        getString(R.string.add_rule).equals(mEdtTitle.getText())) {
+                    String msg = String.format(getActivity().getString(R.string.doNotUseThisWord), mEdtTitle.getText());
                     showDlgTimer(msg);
-                    return ;
+                    return;
                 }
 
-                ArrayList<EditGridData> datas = grid.getGridData();
+                ArrayList<EditGridData> datas = mGrid.getGridData();
                 if (datas == null) {
                     showDlgTimer(R.string.invalidData);
                     mLog.error("onClick <ArrayList<EditGridData> is null>");
-                    return ;
+                    return;
                 }
 
                 ArrayList<String> contents = new ArrayList<String>();
@@ -86,16 +86,16 @@ public class AddFrgmt extends FrgmtBase {
                 }
 
                 UserScrumData scrumData = new UserScrumData();
-                scrumData.setTitle(edtTitle.getText().toString());
+                scrumData.setTitle(mEdtTitle.getText().toString());
                 scrumData.setContents(contents);
 
                 if (!DbHelper.insert(scrumData)) {
                     Toast.makeText(getActivity(), R.string.errInsert, Toast.LENGTH_SHORT).show();
-                    return ;
+                    return;
                 }
 
-                edtTitle.setText("");
-                grid.reset();
+                mEdtTitle.setText("");
+                mGrid.reset();
 
                 showDlgTimer(R.string.insertComplete);
             }
@@ -107,10 +107,10 @@ public class AddFrgmt extends FrgmtBase {
     }
 
     private void showDlgTimer(String msg) {
-        /*DlgTimer dlg = new DlgTimer(getActivity(), R.layout.);
+        DlgTimer dlg = new DlgTimer(getActivity(), R.layout.dlg_timer);
         dlg.setMessage(msg);
         dlg.setTime(1500);
         dlg.show();
-        dlg.setTransparentBaseLayout();*/
+        dlg.setTransparentBaseLayout();
     }
 }

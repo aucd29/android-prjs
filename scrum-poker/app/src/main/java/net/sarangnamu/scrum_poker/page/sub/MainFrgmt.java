@@ -20,6 +20,7 @@ package net.sarangnamu.scrum_poker.page.sub;
 import java.util.ArrayList;
 
 import net.sarangnamu.common.FrgmtBase;
+import net.sarangnamu.scrum_poker.MainActivity;
 import net.sarangnamu.scrum_poker.R;
 import net.sarangnamu.scrum_poker.cfg.Cfg;
 import net.sarangnamu.scrum_poker.page.PageManager;
@@ -33,11 +34,14 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-public class MainFrgmt extends FrgmtBase {
-    private static final String TAG = "MainFrgmt";
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private ArrayList<String> defaultValue;
-    private GridView grid;
+public class MainFrgmt extends FrgmtBase {
+    private static final Logger mLog = LoggerFactory.getLogger(MainFrgmt.class);
+
+    private GridView mGrid;
+    private ArrayList<String> mDefaultValue;
 
     @Override
     protected int getLayoutId() {
@@ -46,48 +50,49 @@ public class MainFrgmt extends FrgmtBase {
 
     @Override
     protected void initLayout() {
-        grid = (GridView) mBaseView.findViewById(R.id.grid);
-        int measureWidth = grid.getMeasuredWidth();
+        mGrid = (GridView) mBaseView.findViewById(R.id.grid);
+        int measureWidth = mGrid.getMeasuredWidth();
 
         initDefaultValue();
         initAdapter();
     }
 
     private void initDefaultValue() {
-        if (defaultValue == null) {
-            defaultValue = new ArrayList<String>();
+        if (mDefaultValue == null) {
+            mDefaultValue = new ArrayList<String>();
         }
 
-        if (defaultValue.size() > 0) {
+        if (mDefaultValue.size() > 0) {
             return;
         }
 
-        defaultValue.add("0");
-        defaultValue.add("1/2");
-        defaultValue.add("2");
+        mDefaultValue.add("0");
+        mDefaultValue.add("1/2");
+        mDefaultValue.add("2");
 
-        defaultValue.add("3");
-        defaultValue.add("5");
-        defaultValue.add("8");
+        mDefaultValue.add("3");
+        mDefaultValue.add("5");
+        mDefaultValue.add("8");
 
-        defaultValue.add("13");
-        defaultValue.add("20");
-        defaultValue.add("30");
+        mDefaultValue.add("13");
+        mDefaultValue.add("20");
+        mDefaultValue.add("30");
 
-        defaultValue.add("60");
-        defaultValue.add("?");
-        defaultValue.add("∞");
+        mDefaultValue.add("60");
+        mDefaultValue.add("?");
+        mDefaultValue.add("∞");
     }
 
     private void initAdapter() {
-        grid.setAdapter(new ScrumAdapter());
-        grid.setOnItemClickListener(new OnItemClickListener() {
+        mGrid.setAdapter(new ScrumAdapter());
+        mGrid.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Bundle bd = new Bundle();
-                bd.putString(Cfg.SCRUM_DATA, defaultValue.get(position));
+                bd.putString(Cfg.SCRUM_DATA, mDefaultValue.get(position));
 
-//                PageManager.getInstance(getActivity()).replace(R.id.content_frame, CardFrgmt.class, bd);
+                ((MainActivity) getActivity()).setAddButtonAlpha(0);
+                PageManager.getInstance(getActivity()).replace(R.id.content_frame, CardFrgmt.class, bd);
             }
         });
     }
@@ -110,11 +115,11 @@ public class MainFrgmt extends FrgmtBase {
     class ScrumAdapter extends BaseAdapter {
         @Override
         public int getCount() {
-            if (defaultValue == null) {
+            if (mDefaultValue == null) {
                 return 0;
             }
 
-            return defaultValue.size();
+            return mDefaultValue.size();
         }
 
         @Override
@@ -142,7 +147,7 @@ public class MainFrgmt extends FrgmtBase {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.number.setText(defaultValue.get(position));
+            holder.number.setText(mDefaultValue.get(position));
 
             return convertView;
         }
