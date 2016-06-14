@@ -1,14 +1,31 @@
 apply plugin: 'com.android.application'
 
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'me.tatarka.retrolambda'
+
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "net.sarangnamu.scrum_poker"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 19
         versionName '1.0.0'
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -24,19 +41,26 @@ android {
     }
     productFlavors {
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
 
-    compile 'com.github.aucd29:common:1.0.3'
-    compile 'com.github.aucd29:ui:1.0.1'
-    compile 'com.github.aucd29:ani:1.0.1'
+    compile 'com.github.aucd29:common:1.0.6'
+    compile 'com.github.aucd29:ui:1.0.2'
+    compile 'com.github.aucd29:realm:1.0.0'
+    compile 'com.github.aucd29:frgmt:1.0.3'
     compile 'com.github.aucd29:fonts:1.0.0'
-    compile 'com.github.aucd29:admob:1.0.0'
-    compile 'com.github.aucd29:sqlite:1.0.0'
-    compile 'com.github.aucd29:frgmt:1.0.0'
+
+//    compile 'com.github.aucd29:ani:1.0.1'
+//    compile 'com.github.aucd29:admob:1.0.0'
+//    compile 'com.github.aucd29:sqlite:1.0.0'
+//    compile 'com.github.aucd29:json:1.0.2'
 }

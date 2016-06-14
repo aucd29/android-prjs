@@ -25,9 +25,7 @@ import net.sarangnamu.common.ui.grid.edit.EditGridData;
 import net.sarangnamu.common.ui.grid.edit.EditGridView;
 import net.sarangnamu.scrum_poker.R;
 import net.sarangnamu.scrum_poker.cfg.Cfg;
-import net.sarangnamu.scrum_poker.db.DbHelper;
-import net.sarangnamu.scrum_poker.db.UserScrumData;
-import android.view.View;
+
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -35,12 +33,15 @@ import android.widget.Toast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import butterknife.Bind;
+import butterknife.OnClick;
+
 public class AddFrgmt extends FrgmtBase {
     private static final Logger mLog = LoggerFactory.getLogger(AddFrgmt.class);
 
-    private EditText mEdtTitle;
-    private ImageButton mSubmit;
-    private EditGridView mGrid;
+    @Bind(R.id.edtTitle) EditText mEdtTitle;
+    @Bind(R.id.submit)   ImageButton mSubmit;
+    @Bind(R.id.grid)     EditGridView mGrid;
 
     @Override
     protected int getLayoutId() {
@@ -50,56 +51,50 @@ public class AddFrgmt extends FrgmtBase {
     @Override
     protected void initLayout() {
         mBaseView.setPadding(0, dpToPixelInt(Cfg.ACTION_BAR_HEIGHT), 0, 0);
+    }
 
-        mEdtTitle = (EditText) mBaseView.findViewById(R.id.edtTitle);
-        mSubmit = (ImageButton) mBaseView.findViewById(R.id.submit);
-        mGrid = (EditGridView) mBaseView.findViewById(R.id.grid);
 
-        mSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mLog.isDebugEnabled()) {
-                    StringBuilder log = new StringBuilder();
-                    log.append("===================================================================\n");
-                    log.append("Add Rule\n");
-                    log.append("===================================================================\n");
-                    mLog.debug(log.toString());
-                }
+    @OnClick(R.id.submit) void submit() {
+        if (mLog.isDebugEnabled()) {
+            StringBuilder log = new StringBuilder();
+            log.append("===================================================================\n");
+            log.append("Add Rule\n");
+            log.append("===================================================================\n");
+            mLog.debug(log.toString());
+        }
 
-                if (getString(R.string.license).equals(mEdtTitle.getText()) ||
-                        getString(R.string.add_rule).equals(mEdtTitle.getText())) {
-                    String msg = String.format(getActivity().getString(R.string.doNotUseThisWord), mEdtTitle.getText());
-                    showDlgTimer(msg);
-                    return;
-                }
+        if (getString(R.string.license).equals(mEdtTitle.getText()) ||
+                getString(R.string.add_rule).equals(mEdtTitle.getText())) {
+            String msg = String.format(getActivity().getString(R.string.doNotUseThisWord), mEdtTitle.getText());
+            showDlgTimer(msg);
+            return;
+        }
 
-                ArrayList<EditGridData> datas = mGrid.getGridData();
-                if (datas == null) {
-                    showDlgTimer(R.string.invalidData);
-                    mLog.error("onClick <ArrayList<EditGridData> is null>");
-                    return;
-                }
+        ArrayList<EditGridData> datas = mGrid.getGridData();
+        if (datas == null) {
+            showDlgTimer(R.string.invalidData);
+            mLog.error("onClick <ArrayList<EditGridData> is null>");
+            return;
+        }
 
-                ArrayList<String> contents = new ArrayList<String>();
-                for (EditGridData data : datas) {
-                    contents.add(data.value);
-                }
+        ArrayList<String> contents = new ArrayList<String>();
+        for (EditGridData data : datas) {
+            contents.add(data.value);
+        }
 
-                UserScrumData scrumData = new UserScrumData();
-                scrumData.setTitle(mEdtTitle.getText().toString());
-                scrumData.setContents(contents);
+//        UserScrumData scrumData = new UserScrumData();
+//        scrumData.setTitle(mEdtTitle.getText().toString());
+//        scrumData.setContents(contents);
+//
+//        if (!DbHelper.insert(scrumData)) {
+//            Toast.makeText(getActivity(), R.string.errInsert, Toast.LENGTH_SHORT).show();
+//            return;
+//        }
 
-                if (!DbHelper.insert(scrumData)) {
-                    Toast.makeText(getActivity(), R.string.errInsert, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+        mEdtTitle.setText("");
+        mGrid.reset();
 
-                mEdtTitle.setText("");
-                mGrid.reset();
-
-                showDlgTimer(R.string.insertComplete);
-            }
-        });
+        showDlgTimer(R.string.insertComplete);
     }
 
     private void showDlgTimer(int resid) {

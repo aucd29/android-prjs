@@ -2,20 +2,19 @@ package net.sarangnamu.scrum_poker;
 
 import java.util.ArrayList;
 
-import net.sarangnamu.common.sqlite.DbManager;
+import net.sarangnamu.common.ui.BkActivity;
 import net.sarangnamu.scrum_poker.db.DbHelper;
 import net.sarangnamu.scrum_poker.page.PageManager;
 import net.sarangnamu.scrum_poker.page.sub.AddFrgmt;
 import net.sarangnamu.scrum_poker.page.sub.MainFrgmt;
 
 import android.content.res.Configuration;
-import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -27,23 +26,22 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MainActivity extends AppCompatActivity {
+import butterknife.Bind;
+
+public class MainActivity extends BkActivity {
     private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
 
-    private DrawerLayout mDrawer;
-    private FrameLayout contentFrame;
-    private NavigationView mNaviView;
+    @Bind(R.id.drawer_layout) DrawerLayout mDrawer;
+    @Bind(R.id.content_frame) FrameLayout mContentFrame;
+    @Bind(R.id.naviView) NavigationView mNaviView;
+    @Bind(R.id.fab) FloatingActionButton mFab;
+
     private ArrayList<MenuData> mMenuData;
     private ActionBarDrawerToggle mToggleActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        contentFrame = (FrameLayout) findViewById(R.id.content_frame);
-        mDrawer      = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNaviView    = (NavigationView) findViewById(R.id.naviView);
 
         if (savedInstanceState == null) {
             initPageManager();
@@ -52,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
         initDrawer();
         initFloatingActionButton();
         initLeftMenu();
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_main;
     }
 
     @Override
@@ -70,12 +73,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        if (!DbManager.getInstance().isAliveDb()) {
-            DbManager.getInstance().open(this, new DbHelper(this));
-        }
+    protected void onDestroy() {
+        super.onDestroy();
 
-        super.onResume();
+        DbHelper.getInstance().closeRealm(getApplicationContext());
     }
 
     private void initPageManager() {
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private void initDrawer() {
         mToggleActionBar = new ActionBarDrawerToggle(this, mDrawer, R.string.app_name, R.string.app_name);
 
-        mDrawer.setDrawerListener(mToggleActionBar);
+//        mDrawer.setDrawerListener(mToggleActionBar);
 //        mDrawer.setScrimColor(Color.TRANSPARENT);
 //        mDrawer.setDrawerListener(new ContentSlidingDrawerListener() {
 //            @Override
@@ -120,20 +121,20 @@ public class MainActivity extends AppCompatActivity {
         mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.app_name)));
         mMenuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.add_rule)));
 
-        DbManager.getInstance().open(this, new DbHelper(this));
-        Cursor cr = DbHelper.select();
-        if (cr.getCount() > 0) {
-            mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.user_rule)));
-
-            while (cr.moveToNext()) {
-                MenuData mnuData = new MenuData(LEFT_MENU_TYPE_DB, cr.getString(1));
-                mnuData.primaryKey = cr.getInt(0);
-
-                mLog.debug("@@ USER RULE : " + cr.getString(1) + ", (" + cr.getInt(0) + ") " + cr.getString(2));
-
-                mMenuData.add(mnuData);
-            }
-        }
+//        DbManager.getInstance().open(this, new DbHelper(this));
+//        Cursor cr = DbHelper.select();
+//        if (cr.getCount() > 0) {
+//            mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.user_rule)));
+//
+//            while (cr.moveToNext()) {
+//                MenuData mnuData = new MenuData(LEFT_MENU_TYPE_DB, cr.getString(1));
+//                mnuData.primaryKey = cr.getInt(0);
+//
+//                mLog.debug("@@ USER RULE : " + cr.getString(1) + ", (" + cr.getInt(0) + ") " + cr.getString(2));
+//
+//                mMenuData.add(mnuData);
+//            }
+//        }
 
         mMenuData.add(new MenuData(LEFT_MENU_TYPE_BAR, getString(R.string.about)));
         mMenuData.add(new MenuData(LEFT_MENU_TYPE_ITEM, getString(R.string.license)));
@@ -158,19 +159,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFloatingActionButton() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setAddButtonAlpha(0);
-                PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class, null);
-            }
+        mFab.setOnClickListener(v -> {
+            setAddButtonAlpha(0);
+            PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class, null);
         });
     }
 
     public void setAddButtonAlpha(int value) {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.animate().alpha(value);
+        mFab.animate().alpha(value);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////

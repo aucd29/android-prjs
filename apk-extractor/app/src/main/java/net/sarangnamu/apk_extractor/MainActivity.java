@@ -1,11 +1,10 @@
 package net.sarangnamu.apk_extractor;
 
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,11 +18,8 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
@@ -56,6 +52,8 @@ import net.sarangnamu.common.ui.list.AniBtnListView;
 import java.io.File;
 import java.util.ArrayList;
 
+import static android.content.DialogInterface.*;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final long SHOW_PROGRESS = 2000000;
     private static final int SHOW_POPUP = 1;
@@ -65,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int SLIDING_MARGIN = 160;
 
     private static final int ET_SDCARD = 0;
-    private static final int ET_EMAIL  = 1;
-    private static final int ET_MENU   = 2;
+    private static final int ET_EMAIL = 1;
+    private static final int ET_MENU = 2;
     private static final int ET_DELETE = 3;
 
     private static final int EMAIL_ACTIVITY = 100;
@@ -146,14 +144,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTitle         = (TextView) findViewById(R.id.title);
-        mPath          = (TextView) findViewById(R.id.path);
-        mDev           = (TextView) findViewById(R.id.dev);
-        mSearch        = (TextView) findViewById(R.id.tvSearch);
-        mEmpty         = (TextView) findViewById(android.R.id.empty);
-        mEdtSearch     = (EditText) findViewById(R.id.search);
-        mMenu          = (ImageButton) findViewById(R.id.menu);
-        mTitleBar      = (RelativeLayout) findViewById(R.id.titleBar);
+        mTitle = (TextView) findViewById(R.id.title);
+        mPath = (TextView) findViewById(R.id.path);
+        mDev = (TextView) findViewById(R.id.dev);
+        mSearch = (TextView) findViewById(R.id.tvSearch);
+        mEmpty = (TextView) findViewById(android.R.id.empty);
+        mEdtSearch = (EditText) findViewById(R.id.search);
+        mMenu = (ImageButton) findViewById(R.id.menu);
+        mTitleBar = (RelativeLayout) findViewById(R.id.titleBar);
         mSdProgressBar = (ProgressBar) findViewById(R.id.sdProgressBar);
 
         initLabel();
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             case DEL_ACTIVITY:
                 if (mDeletedPosition == -1) {
-                    return ;
+                    return;
                 }
 
                 AppList.PkgInfo info = getPkgInfo(mDeletedPosition);
@@ -238,28 +236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // PRIVATE
     //
     ////////////////////////////////////////////////////////////////////////////////////
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     private void initLabel() {
         mTitle.setText(Html.fromHtml(getString(R.string.appName)));
@@ -334,28 +310,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 DlgSortBy dlg = new DlgSortBy(MainActivity.this);
                 dlg.setTitle(R.string.mnu_sortBy);
                 dlg.show();
-                dlg.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        initData(false);
-                    }
-                });
+                dlg.setOnDismissListener(dialog -> { initData(false); });
             }
         });
 
-        mMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int resid;
+        mMenu.setOnClickListener(v -> {
+            int resid;
 
-                if (getShowOption()) {
-                    resid = R.menu.main;
-                } else {
-                    resid = R.menu.main2;
-                }
-
-                MenuManager.getInstance().showMenu(MainActivity.this, v, resid);
+            if (getShowOption()) {
+                resid = R.menu.main;
+            } else {
+                resid = R.menu.main2;
             }
+
+            MenuManager.getInstance().showMenu(MainActivity.this, v, resid);
         });
     }
 
@@ -398,15 +366,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        mEdtSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    setSearchUi();
-                }
-
-                return false;
+        mEdtSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                setSearchUi();
             }
+
+            return false;
         });
 
         mEdtSearch.setTypeface(FontLoader.getInstance(MainActivity.this).getFont("Roboto-Light"));
@@ -525,76 +490,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mSdProgressBar.setVisibility(View.VISIBLE);
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    File src = new File(info.srcDir);
+        new Thread(() -> {
+            try {
+                File src = new File(info.srcDir);
 
-//                    String fileName = BkString.getFileName(info.srcDir);
-                    String fileName = info.appName;
-                    fileName += "-";
-                    fileName += info.versionName;
-                    fileName += ".apk";
+                String fileName = info.appName;
+                fileName += "-";
+                fileName += info.versionName;
+                fileName += ".apk";
 
-//                    int pos = fileName.lastIndexOf("-");
-//                    if (pos != -1) {
-//                        fileName = fileName.substring(0, pos);
-//                        fileName += "-" + info.versionName + ".apk";
-//                    } else {
-//                        fileName = fileName.replace(".apk", "-" + info.versionName + ".apk");
-//                    }
+                BkFile.copyFileTo(src, Cfg.getDownPath(MainActivity.this) + fileName, new BkFile.FileCopyDetailListener() {
+                    long fileSize;
+                    private boolean cancelFlag = false;
 
-                    BkFile.copyFileTo(src, Cfg.getDownPath(MainActivity.this) + fileName, new BkFile.FileCopyDetailListener() {
-                        long fileSize;
-                        private boolean cancelFlag = false;
+                    @Override
+                    public void onCancelled() {
+                    }
 
-                        @Override
-                        public void onCancelled() {
+                    @Override
+                    public boolean isCancelled() {
+                        return cancelFlag;
+                    }
+
+                    @Override
+                    public void onFinish(String name) {
+                        if (info.size > SHOW_PROGRESS) {
+                            sendMessage(HIDE_PROGRESS_BAR, null);
+                            mDlg.dismiss();
                         }
 
-                        @Override
-                        public boolean isCancelled() {
-                            return cancelFlag;
+                        if (mSendEmail) {
+                            sendToEmail(info, name);
+                        } else {
+                            String fileName = BkString.getFileName(name);
+                            sendMessage(SHOW_POPUP, fileName);
                         }
+                    }
 
-                        @Override
-                        public void onFinish(String name) {
-                            if (info.size > SHOW_PROGRESS) {
-                                sendMessage(HIDE_PROGRESS_BAR, null);
-                                mDlg.dismiss();
-                            }
+                    @Override
+                    public void onProcess(int percent) {
+                        sendMessage(UPDATE_PROGRESS_BAR, percent);
+                    }
 
-                            if (mSendEmail) {
-                                sendToEmail(info, name);
-                            } else {
-                                String fileName = BkString.getFileName(name);
-                                sendMessage(SHOW_POPUP, fileName);
-                            }
-                        }
+                    @Override
+                    public void onFileSize(long size) {
+                        fileSize = size;
+                    }
 
-                        @Override
-                        public void onProcess(int percent) {
-                            sendMessage(UPDATE_PROGRESS_BAR, percent);
-                        }
+                    @Override
+                    public long getFileSize() {
+                        return fileSize;
+                    }
 
-                        @Override
-                        public void onFileSize(long size) {
-                            fileSize = size;
-                        }
-
-                        @Override
-                        public long getFileSize() {
-                            return fileSize;
-                        }
-
-                        @Override
-                        public void onError(String errMsg) {
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    @Override
+                    public void onError(String errMsg) {
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }).start();
     }
@@ -606,9 +559,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String regEmail = Cfg.getEmail(MainActivity.this);
 
         if (regEmail == null) {
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[] {});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
         } else {
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[] { regEmail });
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{regEmail});
         }
 
         intent.putExtra(Intent.EXTRA_SUBJECT, "[APK Extractor] Backup " + info.appName);
@@ -617,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         try {
             startActivityForResult(Intent.createChooser(intent, "Send mail..."), EMAIL_ACTIVITY);
-        } catch (android.content.ActivityNotFoundException ex) {
+        } catch (ActivityNotFoundException ex) {
             showPopup(getString(R.string.errorEmail));
         }
     }
@@ -728,15 +681,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, null);
 
                 holder = new ViewHolder();
-                holder.icon      = (ImageView) convertView.findViewById(R.id.icon);
-                holder.name      = (TextView) convertView.findViewById(R.id.name);
-                holder.size      = (TextView) convertView.findViewById(R.id.size);
-                holder.pkgName   = (TextView) convertView.findViewById(R.id.pkgName);
-                holder.version   = (TextView) convertView.findViewById(R.id.version);
-                holder.sd        = (TextView) convertView.findViewById(R.id.sd);
-                holder.email     = (TextView) convertView.findViewById(R.id.email);
-                holder.delete    = (TextView) convertView.findViewById(R.id.delete);
-                holder.row       = (RelativeLayout) convertView.findViewById(R.id.row);
+                holder.icon = (ImageView) convertView.findViewById(R.id.icon);
+                holder.name = (TextView) convertView.findViewById(R.id.name);
+                holder.size = (TextView) convertView.findViewById(R.id.size);
+                holder.pkgName = (TextView) convertView.findViewById(R.id.pkgName);
+                holder.version = (TextView) convertView.findViewById(R.id.version);
+                holder.sd = (TextView) convertView.findViewById(R.id.sd);
+                holder.email = (TextView) convertView.findViewById(R.id.email);
+                holder.delete = (TextView) convertView.findViewById(R.id.delete);
+                holder.row = (RelativeLayout) convertView.findViewById(R.id.row);
                 holder.btnLayout = (LinearLayout) convertView.findViewById(R.id.btnLayout);
 
                 holder.sd.setOnClickListener(MainActivity.this);
@@ -751,12 +704,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             AppList.PkgInfo info = getPkgInfo(position);
             if (info.icon != null) {
-                if (Build.VERSION_CODES.JELLY_BEAN < Build.VERSION.SDK_INT) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     holder.icon.setBackground(info.icon);
                 } else {
                     holder.icon.setBackgroundDrawable(info.icon);
                 }
             }
+
             holder.name.setText(info.appName);
             holder.size.setText(info.appSize);
             holder.pkgName.setText(info.pkgName);
@@ -776,16 +730,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // View.OnClickListener
     //
     ////////////////////////////////////////////////////////////////////////////////////
-
-//    static class FadeStatusBar {
-//        public static void start(Context context, int before, int end) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                Window window = context.getWindow();
-//                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//                window.setStatusBarColor(Color.BLUE);
-//            }
-//        }
-//    }
 
     @Override
     public void onClick(View v) {

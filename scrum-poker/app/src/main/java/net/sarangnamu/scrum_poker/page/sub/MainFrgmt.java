@@ -37,10 +37,14 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+
 public class MainFrgmt extends FrgmtBase {
     private static final Logger mLog = LoggerFactory.getLogger(MainFrgmt.class);
 
-    private GridView mGrid;
+    @Bind(R.id.grid) GridView mGrid;
     private ArrayList<String> mDefaultValue;
 
     @Override
@@ -50,7 +54,6 @@ public class MainFrgmt extends FrgmtBase {
 
     @Override
     protected void initLayout() {
-        mGrid = (GridView) mBaseView.findViewById(R.id.grid);
         int measureWidth = mGrid.getMeasuredWidth();
 
         initDefaultValue();
@@ -108,8 +111,12 @@ public class MainFrgmt extends FrgmtBase {
     //
     ////////////////////////////////////////////////////////////////////////////////////
 
-    class ViewHolder {
-        TextView number;
+    static class ViewHolder {
+        @Bind(R.id.number) TextView number;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 
     class ScrumAdapter extends BaseAdapter {
@@ -138,10 +145,7 @@ public class MainFrgmt extends FrgmtBase {
 
             if (convertView == null) {
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.page_main_scrum_item, null);
-
-                holder = new ViewHolder();
-                holder.number = (TextView) convertView.findViewById(R.id.number);
-
+                holder = new ViewHolder(convertView);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

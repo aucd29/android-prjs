@@ -13,5 +13,19 @@
     <string name="insertComplete">Insert Complete!</string>
     <string name="doNotUseThisWord">Do not use this word (%s)</string>
     <string name="invalidData">Invalid data</string>
-    
+
+    <!--<string-array name="default_value">-->
+        <!--<item>0</item>-->
+        <!--<item>1/2</item>-->
+        <!--<item>2</item>-->
+        <!--<item>3</item>-->
+        <!--<item>5</item>-->
+        <!--<item>8</item>-->
+        <!--<item>13</item>-->
+        <!--<item>20</item>-->
+        <!--<item>30</item>-->
+        <!--<item>60</item>-->
+        <!--<item>"?"</item>-->
+        <!--<item>"∞"</item>-->
+    <!--</string-array>-->
 </resources>

@@ -53,29 +53,26 @@ public class DlgSortBy extends DlgBase {
             mLastInstallTime.setChecked(true);
         }
 
-        mGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                case R.id.sortDefault:
-                    Cfg.setSortBy(getContext(), Cfg.SORT_DEFAULT);
-                    break;
-                case R.id.alphabetAsc:
-                    Cfg.setSortBy(getContext(), Cfg.SORT_ALPHABET_ASC);
-                    break;
-                case R.id.alphabetDesc:
-                    Cfg.setSortBy(getContext(), Cfg.SORT_ALPHABET_DESC);
-                    break;
-                case R.id.firstInstallTime:
-                    Cfg.setSortBy(getContext(), Cfg.SORT_FIRST_INSTALL_TIME);
-                    break;
-                case R.id.lastInstallTime:
-                    Cfg.setSortBy(getContext(), Cfg.SORT_LAST_INSTALL_TIME);
-                    break;
-                }
-
-                dismiss();
+        mGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+            case R.id.sortDefault:
+                Cfg.setSortBy(getContext(), Cfg.SORT_DEFAULT);
+                break;
+            case R.id.alphabetAsc:
+                Cfg.setSortBy(getContext(), Cfg.SORT_ALPHABET_ASC);
+                break;
+            case R.id.alphabetDesc:
+                Cfg.setSortBy(getContext(), Cfg.SORT_ALPHABET_DESC);
+                break;
+            case R.id.firstInstallTime:
+                Cfg.setSortBy(getContext(), Cfg.SORT_FIRST_INSTALL_TIME);
+                break;
+            case R.id.lastInstallTime:
+                Cfg.setSortBy(getContext(), Cfg.SORT_LAST_INSTALL_TIME);
+                break;
             }
+
+            dismiss();
         });
 
         FontLoader.getInstance(getContext()).applyChild("Roboto-Light", mGroup);

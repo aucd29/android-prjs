@@ -47,28 +47,20 @@ public class DlgEmail extends DlgBase {
 
         edit.setTypeface(FontLoader.getInstance(getContext()).getFont("Roboto-Light"));
         btn.setTypeface(FontLoader.getInstance(getContext()).getFont("Roboto-Light"));
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = edit.getText().toString();
-                if (email == null || email.length() == 0) {
-                    return;
-                }
-
-                Cfg.setEmail(getContext(), email);
-                putEmail(email);
-                edit.setText("");
+        btn.setOnClickListener(v -> {
+            String email = edit.getText().toString();
+            if (email == null || email.length() == 0) {
+                return;
             }
+
+            Cfg.setEmail(getContext(), email);
+            putEmail(email);
+            edit.setText("");
         });
 
         final String email = Cfg.getEmail(getContext());
         if (email != null) {
-            layout.post(new Runnable() {
-                @Override
-                public void run() {
-                    putEmail(email);
-                }
-            });
+            layout.post(() -> putEmail(email));
         }
     }
 

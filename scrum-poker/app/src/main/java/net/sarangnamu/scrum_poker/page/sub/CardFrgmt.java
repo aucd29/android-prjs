@@ -23,9 +23,10 @@ import net.sarangnamu.scrum_poker.R;
 import net.sarangnamu.scrum_poker.cfg.Cfg;
 import android.widget.TextView;
 
+import butterknife.Bind;
+
 public class CardFrgmt extends FrgmtBase {
-    private TextView value;
-//    private BlurView blur;
+    @Bind(R.id.value) TextView mValue;
 
     @Override
     protected int getLayoutId() {
@@ -34,9 +35,6 @@ public class CardFrgmt extends FrgmtBase {
 
     @Override
     protected void initLayout() {
-        value = (TextView) mBaseView.findViewById(R.id.value);
-//        blur  = (BlurView) mBaseView.findViewById(R.id.blur);
-
-        value.setText(getArguments().getString(Cfg.SCRUM_DATA, "ERROR"));
+        mValue.setText(getArguments().getString(Cfg.SCRUM_DATA, "ERROR"));
     }
 }
