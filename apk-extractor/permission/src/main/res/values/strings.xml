@@ -1,0 +1,5 @@
+<resources>
+    <string name="permission_title">권한 추가</string>
+    <string name="permission_error">권한 오류가 발생하였습니다.</string>
+    <string name="permission_message">"앱을 올바르게 실행하기 위해서는 권한 추가가 필요합니다."</string>
+</resources>

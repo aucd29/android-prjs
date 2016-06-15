@@ -15,10 +15,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 public class DlgSortBy extends DlgBase {
-    private RadioGroup mGroup;
-    private RadioButton mDefault, mAlphabetAsc, mAlphabetDesc;
-    private RadioButton mFirstInstallTime, mLastInstallTime;
+    @Bind(R.id.sortGroup) RadioGroup mGroup;
+    @Bind(R.id.alphabetAsc) RadioButton mAlphabetAsc;
+    @Bind(R.id.alphabetDesc) RadioButton mAlphabetDesc;
+    @Bind(R.id.firstInstallTime) RadioButton mFirstInstallTime;
+    @Bind(R.id.lastInstallTime) RadioButton mLastInstallTime;
 
     public DlgSortBy(Context context) {
         super(context);
@@ -31,19 +36,12 @@ public class DlgSortBy extends DlgBase {
 
     @Override
     protected void initLayout() {
-        mGroup = (RadioGroup) findViewById(R.id.sortGroup);
-        mDefault = (RadioButton) findViewById(R.id.sortDefault);
-        mAlphabetAsc = (RadioButton) findViewById(R.id.alphabetAsc);
-        mAlphabetDesc = (RadioButton) findViewById(R.id.alphabetDesc);
-        mFirstInstallTime = (RadioButton) findViewById(R.id.firstInstallTime);
-        mLastInstallTime = (RadioButton) findViewById(R.id.lastInstallTime);
+        ButterKnife.bind(this);
 
         AdMobDecorator.getInstance().load(this, R.id.adView);
         String sortBy = Cfg.getSortBy(getContext());
 
-        if (sortBy.equals(Cfg.SORT_DEFAULT)) {
-            mDefault.setChecked(true);
-        } else if (sortBy.equals(Cfg.SORT_ALPHABET_ASC)) {
+        if (sortBy.equals(Cfg.SORT_ALPHABET_ASC)) {
             mAlphabetAsc.setChecked(true);
         } else if (sortBy.equals(Cfg.SORT_ALPHABET_DESC)) {
             mAlphabetDesc.setChecked(true);
@@ -55,9 +53,6 @@ public class DlgSortBy extends DlgBase {
 
         mGroup.setOnCheckedChangeListener((group, checkedId) -> {
             switch (checkedId) {
-            case R.id.sortDefault:
-                Cfg.setSortBy(getContext(), Cfg.SORT_DEFAULT);
-                break;
             case R.id.alphabetAsc:
                 Cfg.setSortBy(getContext(), Cfg.SORT_ALPHABET_ASC);
                 break;

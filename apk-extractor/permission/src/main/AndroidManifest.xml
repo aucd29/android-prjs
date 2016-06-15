@@ -1,0 +1,15 @@
+<manifest
+    package="net.sarangnamu.common.permission"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="net.sarangnamu.common.permission.PermissionActivity"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Transparent"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
+    </application>
+
+</manifest>

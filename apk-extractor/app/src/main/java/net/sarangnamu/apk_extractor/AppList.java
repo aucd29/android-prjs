@@ -52,11 +52,11 @@ public class AppList {
     }
 
     public ArrayList<PkgInfo> getAllApps(Context context, boolean hideSystemApp, String sortBy) {
-        ArrayList<PkgInfo> res = new ArrayList<PkgInfo>();
+        ArrayList<PkgInfo> res = new ArrayList<>();
         List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(0);
 
         if (mIconMap == null) {
-            mIconMap = new WeakHashMap<String, Drawable>();
+            mIconMap = new WeakHashMap<>();
         }
 
         for (int i = 0; i < packs.size(); i++) {
@@ -93,6 +93,8 @@ public class AppList {
         } else if (sortBy.equals(Cfg.SORT_FIRST_INSTALL_TIME)) {
             Collections.sort(res, new SortByFirstInstallTime());
         } else if (sortBy.equals(Cfg.SORT_LAST_INSTALL_TIME)) {
+            Collections.sort(res, new SortByLastInstallTime());
+        } else {
             Collections.sort(res, new SortByLastInstallTime());
         }
 

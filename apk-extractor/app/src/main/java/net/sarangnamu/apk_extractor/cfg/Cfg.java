@@ -39,7 +39,8 @@ public class Cfg extends BkCfg {
         String usrPath = getUserPath(context);
 
         if (usrPath == null) {
-            return BkCfg.sdPath() + PATH;
+//            return BkCfg.sdPath() + PATH;
+            return "/sdcard" + PATH;
         }
 
         return BkString.setLastSlash(usrPath);

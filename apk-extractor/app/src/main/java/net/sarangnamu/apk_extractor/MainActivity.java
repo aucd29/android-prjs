@@ -1,7 +1,7 @@
 package net.sarangnamu.apk_extractor;
 
+import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,6 +44,8 @@ import net.sarangnamu.common.DimTool;
 import net.sarangnamu.common.ani.FadeColor;
 import net.sarangnamu.common.explorer.DirChooserActivity;
 import net.sarangnamu.common.fonts.FontLoader;
+import net.sarangnamu.common.permission.PermissionListener;
+import net.sarangnamu.common.permission.RealTimePermission;
 import net.sarangnamu.common.ui.MenuManager;
 import net.sarangnamu.common.ui.dlg.DlgLicense;
 import net.sarangnamu.common.ui.dlg.DlgTimer;
@@ -51,8 +53,6 @@ import net.sarangnamu.common.ui.list.AniBtnListView;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import static android.content.DialogInterface.*;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final long SHOW_PROGRESS = 2000000;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int ET_MENU = 2;
     private static final int ET_DELETE = 3;
 
-    private static final int EMAIL_ACTIVITY = 100;
+    private static final int SHARING_ACTIVITY = 100;
     private static final int DIR_ACTIVITY = 200;
     private static final int DEL_ACTIVITY = 300;
 
@@ -154,10 +154,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTitleBar = (RelativeLayout) findViewById(R.id.titleBar);
         mSdProgressBar = (ProgressBar) findViewById(R.id.sdProgressBar);
 
+        initPermission();
         initLabel();
         initMenu();
         initSearch();
-        initData(true);
+    }
+
+    private void initPermission() {
+        RealTimePermission.check(this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
+            if (result) {
+                initData(true);
+            }
+        });
     }
 
     @Override
@@ -173,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
 
-            case EMAIL_ACTIVITY:
+            case SHARING_ACTIVITY:
                 if (resultCode == RESULT_OK) {
                 } else if (resultCode == RESULT_CANCELED) {
                 } else {
@@ -417,6 +425,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initData(final boolean initList) {
+        if (Cfg.getSortBy(getApplicationContext()).equals("0")) {
+            // default type
+            Cfg.setSortBy(getApplicationContext(), Cfg.SORT_LAST_INSTALL_TIME);
+        }
+
         new AsyncTask<Context, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
@@ -520,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
 
                         if (mSendEmail) {
-                            sendToEmail(info, name);
+                            sharingApp(info, name);
                         } else {
                             String fileName = BkString.getFileName(name);
                             sendMessage(SHOW_POPUP, fileName);
@@ -552,27 +565,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }).start();
     }
 
-    private void sendToEmail(AppList.PkgInfo info, String target) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("message/rfc822");
-
-        String regEmail = Cfg.getEmail(MainActivity.this);
-
-        if (regEmail == null) {
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
-        } else {
-            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{regEmail});
-        }
-
-        intent.putExtra(Intent.EXTRA_SUBJECT, "[APK Extractor] Backup " + info.appName);
+    private void sharingApp(AppList.PkgInfo info, String target) {
+        Intent intent = new Intent("android.intent.action.SEND_MULTIPLE");
+        intent.setType("application/octet-stream");
         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + target));
-        // intent.putExtra(Intent.EXTRA_TEXT, "");
 
-        try {
-            startActivityForResult(Intent.createChooser(intent, "Send mail..."), EMAIL_ACTIVITY);
-        } catch (ActivityNotFoundException ex) {
-            showPopup(getString(R.string.errorEmail));
-        }
+        startActivityForResult(intent, SHARING_ACTIVITY);
+
+//        Intent intent = new Intent(Intent.ACTION_SEND);
+//        intent.setType("message/rfc822");
+//
+//        String regEmail = Cfg.getEmail(MainActivity.this);
+//
+//        if (regEmail == null) {
+//            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
+//        } else {
+//            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{regEmail});
+//        }
+//
+//        intent.putExtra(Intent.EXTRA_SUBJECT, "[APK Extractor] Backup " + info.appName);
+//        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + target));
+//        // intent.putExtra(Intent.EXTRA_TEXT, "");
+//
+//        try {
+//            startActivityForResult(Intent.createChooser(intent, "Send mail..."), SHARING_ACTIVITY);
+//        } catch (ActivityNotFoundException ex) {
+//            showPopup(getString(R.string.errorEmail));
+//        }
     }
 
     private void showPopup(String msg) {
@@ -755,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             startActivityForResult(intent, DEL_ACTIVITY);
         } else {
-            mSendEmail = ph.type == 0 ? false : true;
+            mSendEmail = ph.type != 0;
             sendToSd(ph.position);
         }
     }
