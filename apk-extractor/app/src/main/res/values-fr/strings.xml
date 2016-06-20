@@ -7,7 +7,7 @@
     <string name="extractOk">Extraction terminée</string>
     <string name="sdcard">SD</string>
     <string name="delete">Supprimer</string>
-    <string name="email">E-mail</string>
+    <string name="sharing">Partage</string>
     <string name="errorEmail">"Aucun client mail installé"</string>
     <string name="sendMailFail">Veuillez vérifier votre connexion</string>
     <string name="regAddr">Adresse enregistrée</string>

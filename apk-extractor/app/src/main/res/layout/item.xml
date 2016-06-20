@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/btn_email_selector"
-            android:text="@string/email" />
+            android:text="@string/sharing" />
 
         <net.sarangnamu.common.fonts.RobotoLightTextView
             android:id="@+id/delete"

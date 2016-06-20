@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
@@ -34,7 +35,6 @@ import android.widget.TextView;
 import android.widget.PopupMenu.OnMenuItemClickListener;
 
 import net.sarangnamu.apk_extractor.cfg.Cfg;
-import net.sarangnamu.apk_extractor.dlg.DlgEmail;
 import net.sarangnamu.apk_extractor.dlg.DlgSortBy;
 import net.sarangnamu.apk_extractor.dlg.DlgSpecialThanks;
 import net.sarangnamu.common.BkCfg;
@@ -154,18 +154,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTitleBar = (RelativeLayout) findViewById(R.id.titleBar);
         mSdProgressBar = (ProgressBar) findViewById(R.id.sdProgressBar);
 
-        initPermission();
+//        initPermission();
         initLabel();
         initMenu();
         initSearch();
+        initData(true);
     }
 
     private void initPermission() {
-        RealTimePermission.check(this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
-            if (result) {
-                initData(true);
-            }
-        });
+//        RealTimePermission.check(this, new String[]{ Manifest.permission.CAMERA }, result -> {
+//            if (result) {
+//
+//            }
+//        });
     }
 
     @Override
@@ -270,9 +271,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case R.id.mnu_search:
                         setSearchUi();
                         break;
-                    case R.id.mnu_email:
-                        showEmailDlg();
-                        break;
+//                    case R.id.mnu_email:
+//                        showEmailDlg();
+//                        break;
                     case R.id.mnu_license:
                         showLicenseDlg();
                         break;
@@ -296,10 +297,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
 
-            void showEmailDlg() {
-                DlgEmail dlg = new DlgEmail(MainActivity.this);
-                dlg.show();
-            }
+//            void showEmailDlg() {
+//                DlgEmail dlg = new DlgEmail(MainActivity.this);
+//                dlg.show();
+//            }
 
             void showLicenseDlg() {
                 DlgLicense dlg = new DlgLicense(MainActivity.this);
@@ -507,12 +508,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 File src = new File(info.srcDir);
 
-                String fileName = info.appName;
+                String fileName = "";
+                String pattern = "^[A-Za-z0-9. ]+$";
+                if (info.appName.matches(pattern)) {
+                    fileName = info.appName;
+                } else {
+                    fileName = info.pkgName;
+                }
+
                 fileName += "-";
                 fileName += info.versionName;
                 fileName += ".apk";
 
-                BkFile.copyFileTo(src, Cfg.getDownPath(MainActivity.this) + fileName, new BkFile.FileCopyDetailListener() {
+                String apkFullPath = Cfg.getDownPath(MainActivity.this) + fileName;
+
+                if (new File(apkFullPath).exists()) {
+                    if (mDlg.isShowing()) {
+                        mDlg.dismiss();
+                    }
+
+                    if (mSendEmail) {
+                        sharingApp(info, Cfg.getDownPath(MainActivity.this) + fileName);
+                    } else {
+                        String msg = String.format(getString(R.string.existApp), apkFullPath);
+                        Snackbar.make(getListView(), msg, Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    return ;
+                }
+
+                BkFile.copyFileTo(src, apkFullPath, new BkFile.FileCopyDetailListener() {
                     long fileSize;
                     private boolean cancelFlag = false;
 
@@ -566,11 +591,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void sharingApp(AppList.PkgInfo info, String target) {
-        Intent intent = new Intent("android.intent.action.SEND_MULTIPLE");
+        // https://developer.android.com/training/sharing/send.html#send-binary-content
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
         intent.setType("application/octet-stream");
         intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + target));
 
-        startActivityForResult(intent, SHARING_ACTIVITY);
+        startActivityForResult(Intent.createChooser(intent, "Send To"), SHARING_ACTIVITY);
 
 //        Intent intent = new Intent(Intent.ACTION_SEND);
 //        intent.setType("message/rfc822");
@@ -607,9 +634,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showFileExplorer() {
-        Intent intent = new Intent(this, DirChooserActivity.class);
-
-        startActivityForResult(intent, DIR_ACTIVITY);
+        RealTimePermission.check(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
+            @Override
+            public void result(boolean result) {
+                Intent intent = new Intent(MainActivity.this, DirChooserActivity.class);
+                startActivityForResult(intent, DIR_ACTIVITY);
+            }
+        });
     }
 
     private void showSystemApp() {
@@ -774,8 +805,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             startActivityForResult(intent, DEL_ACTIVITY);
         } else {
-            mSendEmail = ph.type != 0;
-            sendToSd(ph.position);
+            RealTimePermission.check(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
+                if (result) {
+                    mSendEmail = ph.type != 0;
+                    sendToSd(ph.position);
+                }
+            });
         }
     }
 

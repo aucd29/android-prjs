@@ -7,13 +7,14 @@
     <string name="extractOk">Extract OK!</string>
     <string name="sdcard">sd</string>
     <string name="delete">Delete</string>
-    <string name="email">E-mail</string>
+    <string name="sharing">Sharing</string>
     <string name="dlgEmail">E-Mail : </string>
     <string name="errorEmail">There are no email clients installed.</string>
     <string name="sendMailFail">Please check network</string>
     <string name="regAddr">Registered Address</string>
     <string name="save">Save</string>
     <string name="emptyList">Could not find a App</string>
+    <string name="existApp">Exist App (%s)</string>
     
     <!-- dlg order by  -->
     <string name="sortDefault">Default</string>
@@ -31,4 +32,5 @@
     <string name="mnu_specialThanks">Special Thanks</string>
     <string name="mnu_license">License</string>
     <string name="mnu_sortBy">Sort By</string>
+
 </resources>

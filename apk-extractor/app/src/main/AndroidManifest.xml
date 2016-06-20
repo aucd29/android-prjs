@@ -29,6 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name="net.sarangnamu.common.explorer.DirChooserActivity"
             android:exported="false"
@@ -49,14 +50,6 @@
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent"/>
-
-        <activity
-            android:name="net.sarangnamu.common.permission.PermissionActivity"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Transparent"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            />
     </application>
 
 </manifest>

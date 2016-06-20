@@ -4,11 +4,13 @@
     <string name="plsWait">잠시만 기다려 주세요..</string>
     <string name="extractOk">추출 되었습니다.</string>
     <string name="delete">삭제</string>
+    <string name="sharing">공유</string>
     <string name="errorEmail">이메일 클라이언트가 설치되지 않았습니다.</string>
     <string name="sendMailFail">네트워크를 확인하세요</string>
     <string name="regAddr">등록된 주소</string>
     <string name="save">저장</string>
     <string name="emptyList">앱을 찾을 수 없습니다.</string>
+    <string name="existApp">다음의 위치에 존재 합니다. (%s)</string>
     
     <!-- MENU -->
     <string name="mnu_email">이메일 주소 설정</string>

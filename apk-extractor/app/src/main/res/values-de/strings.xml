@@ -7,7 +7,7 @@
     <string name="extractOk">Auszug OK!</string>
     <string name="sdcard">sd</string>
     <string name="delete">löschen</string>
-    <string name="email">e-mail</string>
+    <string name="sharing">Teilen</string>
     <string name="dlgEmail">E-Mail : </string>
     <string name="errorEmail">Es gibt keine E-Mail-Clients installiert.</string>
     <string name="sendMailFail">Bitte überprüfen Sie Netzwerk</string>
