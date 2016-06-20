@@ -17,4 +17,5 @@
     <string name="mnu_showInstalledApps">インストールされているアプリを見る</string>
     <string name="mnu_setSdPath">アプリのパスを指定</string>
     <string name="mnu_license">ライセンス</string>
+    <string name="sdcard"></string>
 </resources>

@@ -19,4 +19,6 @@
     <string name="mnu_showInstalledApps">설치된 앱 보기</string>
     <string name="mnu_setSdPath">앱 경로 지정</string>
     <string name="mnu_license">라이센스</string>
+    <string name="mnu_sortBy">정렬</string>
+    <string name="mnu_specialThanks">고마운분들</string>
 </resources>
