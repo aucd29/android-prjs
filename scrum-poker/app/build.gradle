@@ -50,14 +50,14 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
 
-    compile 'com.github.aucd29:common:1.0.6'
-    compile 'com.github.aucd29:ui:1.0.2'
+    compile 'com.github.aucd29:common:1.0.7'
+    compile 'com.github.aucd29:ui:1.0.3'
     compile 'com.github.aucd29:realm:1.0.0'
     compile 'com.github.aucd29:frgmt:1.0.3'
     compile 'com.github.aucd29:fonts:1.0.0'
+
+    compile 'jp.wasabeef:blurry:2.0.2'
 
 //    compile 'com.github.aucd29:ani:1.0.1'
 //    compile 'com.github.aucd29:admob:1.0.0'

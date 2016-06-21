@@ -2,7 +2,6 @@ package net.sarangnamu.scrum_poker;
 
 import java.util.ArrayList;
 
-import net.sarangnamu.common.ui.BkActivity;
 import net.sarangnamu.scrum_poker.db.DbHelper;
 import net.sarangnamu.scrum_poker.page.PageManager;
 import net.sarangnamu.scrum_poker.page.sub.AddFrgmt;
