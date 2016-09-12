@@ -416,6 +416,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void searchFromMirror() {
+        BkCfg.hideKeyboard(findViewById(R.id.search));
         Intent intent = new Intent(MainActivity.this, WebActivity.class);
         startActivity(intent);
     }
@@ -529,6 +530,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mSearch.setVisibility(View.GONE);
                 mTitle.setVisibility(View.VISIBLE);
                 FadeColor.startResource(mTitleBar, R.color.dBgSearch, R.color.dBg, null);
+                FadeStatusBar.start(getWindow(), R.color.dBgSearch, R.color.colorPrimaryDark, null);
 
                 BkCfg.hideKeyboard(mEdtSearch);
             }
