@@ -198,13 +198,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
                 AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(mDeletedPosition);
-                try {
-                    getPackageManager().getApplicationInfo(info.pkgName, 0);
-                } catch (PackageManager.NameNotFoundException e) {
-                    AppListManager.getInstance().removeDataListAndRefereshList(mDeletedPosition);
-
-                    notifyDataSetChanged();
-                }
+                AppListManager.getInstance().removeDataListAndRefereshList(info);
+                notifyDataSetChanged();
 
                 mDeletedPosition = -1;
                 break;
@@ -225,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed() {
         if (AppListManager.getInstance().isSearchedList()) {
             AppListManager.getInstance().resetSearchedList();
+            notifyDataSetChanged();
+
             if (mEdtSearch.getVisibility() != View.GONE) {
                 setSearchUi();
             }
@@ -412,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             FadeStatusBar.start(getWindow(), R.color.dBgSearch, R.color.colorPrimaryDark, null);
 
             BkCfg.hideKeyboard(mEdtSearch);
+
+            // reset
         }
     }
 
@@ -526,17 +525,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (ph.type == AppAdapter.ET_MENU) {
             if (mEdtSearch.getVisibility() != View.GONE) {
-                mEdtSearch.setVisibility(View.GONE);
-                mSearch.setVisibility(View.GONE);
-                mTitle.setVisibility(View.VISIBLE);
-                FadeColor.startResource(mTitleBar, R.color.dBgSearch, R.color.dBg, null);
-                FadeStatusBar.start(getWindow(), R.color.dBgSearch, R.color.colorPrimaryDark, null);
+//                mEdtSearch.setVisibility(View.GONE);
+//                mSearch.setVisibility(View.GONE);
+//                mTitle.setVisibility(View.VISIBLE);
+//                FadeColor.startResource(mTitleBar, R.color.dBgSearch, R.color.dBg, null);
+//                FadeStatusBar.start(getWindow(), R.color.dBgSearch, R.color.colorPrimaryDark, null);
 
                 BkCfg.hideKeyboard(mEdtSearch);
             }
 
             ((AniBtnListView) getListView()).toggleMenu(v);
         } else if (ph.type == AppAdapter.ET_DELETE) {
+//            if (AppListManager.getInstance().isSearchedList()) {
+//                AppListManager.getInstance().resetSearchedList();
+//                notifyDataSetChanged();
+//
+//                if (mEdtSearch.getVisibility() != View.GONE) {
+//                    setSearchUi();
+//                }
+//            }
+
             AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(ph.position);
             mDeletedPosition = ph.position;
 
@@ -546,6 +554,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(intent, DEL_ACTIVITY);
         } else {
             RunTimePermission.check(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
+//                if (AppListManager.getInstance().isSearchedList()) {
+//                    AppListManager.getInstance().resetSearchedList();
+//                    notifyDataSetChanged();
+//
+//                    if (mEdtSearch.getVisibility() != View.GONE) {
+//                        setSearchUi();
+//                    }
+//                }
+
                 if (result) {
                     mSendEmail = ph.type != 0;
                     final AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(ph.position);

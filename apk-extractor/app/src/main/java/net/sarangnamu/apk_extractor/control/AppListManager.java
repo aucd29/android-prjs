@@ -87,13 +87,32 @@ public class AppListManager {
         return mPkgInfoList;
     }
 
-    public void removeDataListAndRefereshList(int pos) {
-        if (mSearchedList) {
-            mPkgInfoSearchedList.remove(pos);
-        } else {
-            mPkgInfoList.remove(pos);
+//    public void removeDataListAndRefereshList(int pos) {
+//        if (mSearchedList) {
+//            mPkgInfoSearchedList.remove(pos);
+//        } else {
+//            mPkgInfoList.remove(pos);
+//        }
+//    }
+
+    public void removeDataListAndRefereshList(AppList.PkgInfo pkgInfo) {
+        if (mPkgInfoSearchedList != null && mPkgInfoSearchedList.size() > 0) {
+            for (AppList.PkgInfo info : mPkgInfoSearchedList) {
+                if (info.equals(pkgInfo)) {
+                    mPkgInfoSearchedList.remove(info);
+                }
+            }
+        }
+
+        if (mPkgInfoList != null && mPkgInfoList.size() > 0) {
+            for (AppList.PkgInfo info : mPkgInfoList) {
+                if (info.equals(pkgInfo)) {
+                    mPkgInfoList.remove(info);
+                }
+            }
         }
     }
+
 
     public void resetSearchedList() {
         mPkgInfoSearchedList.clear();
