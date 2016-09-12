@@ -2,6 +2,7 @@ package net.sarangnamu.scrum_poker;
 
 import java.util.ArrayList;
 
+import net.sarangnamu.common.BkActivity;
 import net.sarangnamu.scrum_poker.db.DbHelper;
 import net.sarangnamu.scrum_poker.page.PageManager;
 import net.sarangnamu.scrum_poker.page.sub.AddFrgmt;
@@ -14,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -25,22 +27,26 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import butterknife.Bind;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-public class MainActivity extends BkActivity {
+public class MainActivity extends AppCompatActivity {
     private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
 
-    @Bind(R.id.drawer_layout) DrawerLayout mDrawer;
-    @Bind(R.id.content_frame) FrameLayout mContentFrame;
-    @Bind(R.id.naviView) NavigationView mNaviView;
-    @Bind(R.id.fab) FloatingActionButton mFab;
+    @BindView(R.id.drawer_layout) DrawerLayout mDrawer;
+    @BindView(R.id.content_frame) FrameLayout mContentFrame;
+    @BindView(R.id.naviView) NavigationView mNaviView;
+    @BindView(R.id.fab) FloatingActionButton mFab;
 
     private ArrayList<MenuData> mMenuData;
     private ActionBarDrawerToggle mToggleActionBar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(getLayoutId());
+        ButterKnife.bind(this);
 
         if (savedInstanceState == null) {
             initPageManager();
@@ -51,7 +57,6 @@ public class MainActivity extends BkActivity {
         initLeftMenu();
     }
 
-    @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
     }

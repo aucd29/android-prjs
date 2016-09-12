@@ -1,77 +1,70 @@
 package net.sarangnamu.apk_extractor;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.PopupMenu.OnMenuItemClickListener;
 
-import net.sarangnamu.apk_extractor.cfg.Cfg;
-import net.sarangnamu.apk_extractor.dlg.DlgSortBy;
-import net.sarangnamu.apk_extractor.dlg.DlgSpecialThanks;
+import net.sarangnamu.apk_extractor.control.AppAdapter;
+import net.sarangnamu.apk_extractor.control.BackupUtil;
+import net.sarangnamu.apk_extractor.control.DialogDelegate;
+import net.sarangnamu.apk_extractor.model.AppList;
+import net.sarangnamu.apk_extractor.control.AppListManager;
+import net.sarangnamu.apk_extractor.model.Cfg;
+import net.sarangnamu.apk_extractor.control.receiver.Receiver;
 import net.sarangnamu.common.BkCfg;
 import net.sarangnamu.common.BkFile;
 import net.sarangnamu.common.BkString;
 import net.sarangnamu.common.DimTool;
 import net.sarangnamu.common.ani.FadeColor;
+import net.sarangnamu.common.ani.FadeStatusBar;
 import net.sarangnamu.common.explorer.DirChooserActivity;
 import net.sarangnamu.common.fonts.FontLoader;
-import net.sarangnamu.common.permission.PermissionListener;
-import net.sarangnamu.common.permission.RealTimePermission;
+import net.sarangnamu.common.permission.RunTimePermission;
 import net.sarangnamu.common.ui.MenuManager;
-import net.sarangnamu.common.ui.dlg.DlgLicense;
 import net.sarangnamu.common.ui.dlg.DlgTimer;
 import net.sarangnamu.common.ui.list.AniBtnListView;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final long SHOW_PROGRESS = 2000000;
+    private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
+
     private static final int SHOW_POPUP = 1;
     private static final int UPDATE_PROGRESS_BAR = 2;
     private static final int HIDE_PROGRESS_BAR = 3;
 
     private static final int SLIDING_MARGIN = 160;
 
-    private static final int ET_SDCARD = 0;
-    private static final int ET_EMAIL = 1;
-    private static final int ET_MENU = 2;
-    private static final int ET_DELETE = 3;
-
     private static final int SHARING_ACTIVITY = 100;
     private static final int DIR_ACTIVITY = 200;
     private static final int DEL_ACTIVITY = 300;
 
-    private boolean mSendEmail = false, mSearchedList = false;
+    private boolean mSendEmail = false;
     private int mDeletedPosition = -1;
     private TextView mTitle, mPath, mDev, mSearch, mEmpty;
     private EditText mEdtSearch;
@@ -79,9 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageButton mMenu;
     private RelativeLayout mTitleBar;
     private ProgressBar mSdProgressBar;
-    private ProgressDialog mDlg;
-    private ArrayList<AppList.PkgInfo> mPkgInfoList;
-    private ArrayList<AppList.PkgInfo> mPkgInfoSearchedList;
+
 
     ////////////////////////////////////////////////////////////////////////////////////
     //
@@ -90,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ////////////////////////////////////////////////////////////////////////////////////
 
     private Handler mHandler = new Handler(new ProcessHandler());
-
     private class ProcessHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
@@ -144,29 +134,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTitle = (TextView) findViewById(R.id.title);
-        mPath = (TextView) findViewById(R.id.path);
-        mDev = (TextView) findViewById(R.id.dev);
-        mSearch = (TextView) findViewById(R.id.tvSearch);
-        mEmpty = (TextView) findViewById(android.R.id.empty);
-        mEdtSearch = (EditText) findViewById(R.id.search);
-        mMenu = (ImageButton) findViewById(R.id.menu);
-        mTitleBar = (RelativeLayout) findViewById(R.id.titleBar);
+        mTitle         = (TextView) findViewById(R.id.title);
+        mPath          = (TextView) findViewById(R.id.path);
+        mDev           = (TextView) findViewById(R.id.dev);
+        mSearch        = (TextView) findViewById(R.id.tvSearch);
+        mEmpty         = (TextView) findViewById(android.R.id.empty);
+        mEdtSearch     = (EditText) findViewById(R.id.search);
+        mMenu          = (ImageButton) findViewById(R.id.menu);
+        mTitleBar      = (RelativeLayout) findViewById(R.id.titleBar);
         mSdProgressBar = (ProgressBar) findViewById(R.id.sdProgressBar);
 
-//        initPermission();
         initLabel();
         initMenu();
         initSearch();
         initData(true);
     }
 
-    private void initPermission() {
-//        RealTimePermission.check(this, new String[]{ Manifest.permission.CAMERA }, result -> {
-//            if (result) {
-//
-//            }
-//        });
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        String appEvent = intent.getStringExtra(Receiver.APPEVENT);
+        String pkgName  = intent.getStringExtra(Receiver.PKGNAME);
+
+        if (mLog.isDebugEnabled()) {
+            String log = "";
+            log += "===================================================================\n";
+            log += "APPEVENT: " + appEvent + "\n";
+            log += "    NAME: " + pkgName + "\n";
+            log += "===================================================================\n";
+            mLog.debug(log);
+        }
+
+        if (!TextUtils.isEmpty(appEvent) && !TextUtils.isEmpty(pkgName)) {
+            runTimeUpdatePkgInfoList(appEvent, pkgName);
+        }
     }
 
     @Override
@@ -195,11 +197,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
 
-                AppList.PkgInfo info = getPkgInfo(mDeletedPosition);
+                AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(mDeletedPosition);
                 try {
                     getPackageManager().getApplicationInfo(info.pkgName, 0);
                 } catch (PackageManager.NameNotFoundException e) {
-                    removeDataListAndRefereshList(mDeletedPosition);
+                    AppListManager.getInstance().removeDataListAndRefereshList(mDeletedPosition);
+
+                    notifyDataSetChanged();
                 }
 
                 mDeletedPosition = -1;
@@ -219,15 +223,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-        if (mSearchedList) {
-            mPkgInfoSearchedList.clear();
-            mSearchedList = false;
-            notifyDataSetChanged();
+        if (AppListManager.getInstance().isSearchedList()) {
+            AppListManager.getInstance().resetSearchedList();
+            if (mEdtSearch.getVisibility() != View.GONE) {
+                setSearchUi();
+            }
 
             return;
         } else if (mEdtSearch.getVisibility() != View.GONE) {
             setSearchUi();
             return;
+        } else if (((AniBtnListView) getListView()).isShowMenu()) {
+            ((AniBtnListView) getListView()).hideMenu();
+            return ;
         }
 
         super.onBackPressed();
@@ -236,8 +244,69 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         BkCfg.hideKeyboard(mEdtSearch);
-
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String appEvent = BkCfg.get(getApplicationContext(), Receiver.APPEVENT, null);
+        String pkgName  = BkCfg.get(getApplicationContext(), Receiver.PKGNAME, null);
+
+        if (mLog.isDebugEnabled()) {
+            String log = "";
+            log += "===================================================================\n";
+            log += "APPEVENT: " + appEvent + "\n";
+            log += "    NAME: " + pkgName + "\n";
+            log += "===================================================================\n";
+            mLog.debug(log);
+        }
+
+        if (!TextUtils.isEmpty(appEvent) && !TextUtils.isEmpty(pkgName)) {
+            runTimeUpdatePkgInfoList(appEvent, pkgName);
+            resetAppEventPreference();
+        }
+    }
+
+    private void runTimeUpdatePkgInfoList(String type, String pkgName) {
+        if (Receiver.APP_REMOVED.equals(type)) {
+            if (mLog.isDebugEnabled()) {
+                mLog.debug("rumtime remove");
+            }
+
+            uninstallPkgInfo(pkgName, AppListManager.getInstance().getPkgInfoList());
+            notifyDataSetChanged();
+        } else if (Receiver.APP_ADDED.equals(type)) {
+            if (mLog.isDebugEnabled()) {
+                mLog.debug("runtime add");
+            }
+
+            AppList.PkgInfo info = AppList.getInstance().getPkgInfo(getApplicationContext(), pkgName);
+            if (info == null) {
+                mLog.error("ERROR: info == null");
+                return ;
+            }
+
+            AppListManager.getInstance().updatePkgInfoList(info, mEdtSearch.getText().toString());
+            notifyDataSetChanged();
+        }
+    }
+
+    private void uninstallPkgInfo(String pkgName, ArrayList<AppList.PkgInfo> list) {
+        if (list != null && list.size() > 0) {
+            for (AppList.PkgInfo info : list) {
+                if (info.pkgName.equals(pkgName)) {
+                    list.remove(info);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void resetAppEventPreference() {
+        BkCfg.set(getApplicationContext(), Receiver.APPEVENT, null);
+        BkCfg.set(getApplicationContext(), Receiver.PKGNAME, null);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -264,75 +333,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initMenu() {
-        MenuManager.getInstance().setListener(new OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.mnu_search:
-                        setSearchUi();
-                        break;
-//                    case R.id.mnu_email:
-//                        showEmailDlg();
-//                        break;
-                    case R.id.mnu_license:
-                        showLicenseDlg();
-                        break;
-                    case R.id.mnu_setSdPath:
-                        showFileExplorer();
-                        break;
-                    case R.id.mnu_showSystemApp:
-                        showSystemApp();
-                        break;
-                    case R.id.mnu_showInstalledApp:
-                        showInstalledApp();
-                        break;
-                    case R.id.mnu_specialThanks:
-                        showSpecialThanks();
-                        break;
-                    case R.id.mnu_sortBy:
-                        showSortBy();
-                        break;
-                }
-
-                return false;
+        MenuManager.getInstance().setListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.mnu_search:               setSearchUi();          break;
+                case R.id.mnu_search_from_mirror:   searchFromMirror();     break;
+                case R.id.mnu_license:
+                    DialogDelegate.getInstance().showLicenseDlg(MainActivity.this);
+                    break;
+                case R.id.mnu_setSdPath:            showFileExplorer();     break;
+                case R.id.mnu_showSystemApp:        showSystemApp();        break;
+                case R.id.mnu_showInstalledApp:     showInstalledApp();     break;
+                case R.id.mnu_specialThanks:
+                    DialogDelegate.getInstance().showSpecialThanks(MainActivity.this);
+                    break;
+                case R.id.mnu_sortBy:
+                    DialogDelegate.getInstance().showSortBy(MainActivity.this);
+                    break;
             }
 
-//            void showEmailDlg() {
-//                DlgEmail dlg = new DlgEmail(MainActivity.this);
-//                dlg.show();
-//            }
-
-            void showLicenseDlg() {
-                DlgLicense dlg = new DlgLicense(MainActivity.this);
-                dlg.setTitleTypeface(FontLoader.getInstance(getApplicationContext()).getRobotoLight());
-                dlg.show();
-            }
-
-            void showSpecialThanks() {
-                DlgSpecialThanks dlg = new DlgSpecialThanks(MainActivity.this);
-                dlg.setTitleTypeface(FontLoader.getInstance(getApplicationContext()).getRobotoLight());
-                dlg.setTitle("Special Thanks");
-                dlg.show();
-            }
-
-            void showSortBy() {
-                DlgSortBy dlg = new DlgSortBy(MainActivity.this);
-                dlg.setTitle(R.string.mnu_sortBy);
-                dlg.show();
-                dlg.setOnDismissListener(dialog -> { initData(false); });
-            }
+            return false;
         });
 
         mMenu.setOnClickListener(v -> {
-            int resid;
-
-            if (getShowOption()) {
-                resid = R.menu.main;
-            } else {
-                resid = R.menu.main2;
-            }
-
-            MenuManager.getInstance().showMenu(MainActivity.this, v, resid);
+            MenuManager.getInstance().showMenu(MainActivity.this, v,
+                    Cfg.getShowOption(MainActivity.this).equals("0") ? R.menu.main : R.menu.main2);
         });
     }
 
@@ -342,34 +366,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mEdtSearch.setImeOptions(EditorInfo.IME_ACTION_DONE);
         mEdtSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (mPkgInfoSearchedList == null) {
-                    mPkgInfoSearchedList = new ArrayList<AppList.PkgInfo>();
-                }
-
-                mPkgInfoSearchedList.clear();
-                String keyword = mEdtSearch.getText().toString();
-
-                if (keyword != null && keyword.length() > 0) {
-                    mSearchedList = true;
-                    keyword = keyword.toLowerCase();
-
-                    for (AppList.PkgInfo info : mPkgInfoList) {
-                        if (info.appName.toLowerCase().contains(keyword)) {
-                            mPkgInfoSearchedList.add(info);
-                        }
-                    }
-                } else {
-                    mSearchedList = false;
-                }
+                AppListManager.getInstance().afterTextChanged(mEdtSearch.getText().toString());
 
                 notifyDataSetChanged();
             }
@@ -393,39 +396,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mSearch.setVisibility(View.VISIBLE);
             mTitle.setVisibility(View.GONE);
             FadeColor.startResource(mTitleBar, R.color.dBg, R.color.dBgSearch, null);
+            FadeStatusBar.start(getWindow(), R.color.colorPrimaryDark, R.color.dBgSearch, null);
 
             mEdtSearch.setText("");
 
             BkCfg.showKeyboard(mEdtSearch);
+
+            AniBtnListView list = (AniBtnListView) getListView();
+            list.hideMenu();
         } else {
             mEdtSearch.setVisibility(View.GONE);
             mSearch.setVisibility(View.GONE);
             mTitle.setVisibility(View.VISIBLE);
             FadeColor.startResource(mTitleBar, R.color.dBgSearch, R.color.dBg, null);
+            FadeStatusBar.start(getWindow(), R.color.dBgSearch, R.color.colorPrimaryDark, null);
 
             BkCfg.hideKeyboard(mEdtSearch);
         }
     }
 
-    private AppList.PkgInfo getPkgInfo(int position) {
-        if (mSearchedList) {
-            return mPkgInfoSearchedList.get(position);
-        } else {
-            return mPkgInfoList.get(position);
-        }
+    private void searchFromMirror() {
+        Intent intent = new Intent(MainActivity.this, WebActivity.class);
+        startActivity(intent);
     }
 
-    private void removeDataListAndRefereshList(int pos) {
-        if (mSearchedList) {
-            mPkgInfoSearchedList.remove(mDeletedPosition);
-        } else {
-            mPkgInfoList.remove(mDeletedPosition);
-        }
-
-        notifyDataSetChanged();
-    }
-
-    private void initData(final boolean initList) {
+    public void initData(final boolean initList) {
         if (Cfg.getSortBy(getApplicationContext()).equals("0")) {
             // default type
             Cfg.setSortBy(getApplicationContext(), Cfg.SORT_LAST_INSTALL_TIME);
@@ -434,34 +429,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new AsyncTask<Context, Void, Boolean>() {
             @Override
             protected void onPreExecute() {
-                showProgress();
+                DialogDelegate.getInstance().showProgress(MainActivity.this);
             }
 
             @Override
             protected Boolean doInBackground(Context... contexts) {
-                Context context = contexts[0];
-
-                if (mPkgInfoList != null) {
-                    mPkgInfoList.clear();
-                    mPkgInfoList = null;
-                }
-
-                mPkgInfoList = AppList.getInstance().getAllApps(context
-                        , getShowOption()
-                        , getSortByOption());
+                AppListManager.getInstance().initPkgInfoList();
 
                 return false;
             }
 
             @Override
             protected void onPostExecute(Boolean result) {
-                mDlg.dismiss();
+                DialogDelegate.getInstance().hideProgress(MainActivity.this);
 
                 if (initList) {
                     initListView();
                 } else {
                     AniBtnListView list = (AniBtnListView) getListView();
-                    list.resetCheckedList();
+                    list.hideMenu();
+//                    list.resetCheckedList();
                     notifyDataSetChanged();
                 }
             }
@@ -469,25 +456,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void notifyDataSetChanged() {
-        BaseAdapter tmpAdapter = (BaseAdapter) getListAdapter();
+        BaseAdapter tmpAdapter = getListAdapter();
         if (tmpAdapter != null) {
             tmpAdapter.notifyDataSetChanged();
         }
     }
 
-    private void showProgress() {
-        mDlg = new ProgressDialog(MainActivity.this);
-        mDlg.setCancelable(false);
-        mDlg.setMessage(getString(R.string.plsWait));
-        mDlg.show();
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            mDlg.setContentView(R.layout.dlg_progress);
-        }
-    }
-
     private void initListView() {
-        mAdapter = new AppAdapter();
+        mAdapter = new AppAdapter(MainActivity.this, MainActivity.this);
         setListAdapter(mAdapter);
 
         AniBtnListView list = (AniBtnListView) getListView();
@@ -497,128 +473,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         list.setEmptyView(mEmpty);
     }
 
-    private void sendToSd(int position) {
-        final AppList.PkgInfo info = getPkgInfo(position);
-        if (info.size > SHOW_PROGRESS) {
-            showProgress();
-            mSdProgressBar.setVisibility(View.VISIBLE);
-        }
-
-        new Thread(() -> {
-            try {
-                File src = new File(info.srcDir);
-
-                String fileName = "";
-                String pattern = "^[A-Za-z0-9. ]+$";
-                if (info.appName.matches(pattern)) {
-                    fileName = info.appName;
-                } else {
-                    fileName = info.pkgName;
-                }
-
-                fileName += "-";
-                fileName += info.versionName;
-                fileName += ".apk";
-
-                String apkFullPath = Cfg.getDownPath(MainActivity.this) + fileName;
-
-                if (new File(apkFullPath).exists()) {
-                    if (mDlg.isShowing()) {
-                        mDlg.dismiss();
-                    }
-
-                    if (mSendEmail) {
-                        sharingApp(info, Cfg.getDownPath(MainActivity.this) + fileName);
-                    } else {
-                        String msg = String.format(getString(R.string.existApp), apkFullPath);
-                        Snackbar.make(getListView(), msg, Snackbar.LENGTH_SHORT).show();
-                    }
-
-                    return ;
-                }
-
-                BkFile.copyFileTo(src, apkFullPath, new BkFile.FileCopyDetailListener() {
-                    long fileSize;
-                    private boolean cancelFlag = false;
-
-                    @Override
-                    public void onCancelled() {
-                    }
-
-                    @Override
-                    public boolean isCancelled() {
-                        return cancelFlag;
-                    }
-
-                    @Override
-                    public void onFinish(String name) {
-                        if (info.size > SHOW_PROGRESS) {
-                            sendMessage(HIDE_PROGRESS_BAR, null);
-                            mDlg.dismiss();
-                        }
-
-                        if (mSendEmail) {
-                            sharingApp(info, name);
-                        } else {
-                            String fileName = BkString.getFileName(name);
-                            sendMessage(SHOW_POPUP, fileName);
-                        }
-                    }
-
-                    @Override
-                    public void onProcess(int percent) {
-                        sendMessage(UPDATE_PROGRESS_BAR, percent);
-                    }
-
-                    @Override
-                    public void onFileSize(long size) {
-                        fileSize = size;
-                    }
-
-                    @Override
-                    public long getFileSize() {
-                        return fileSize;
-                    }
-
-                    @Override
-                    public void onError(String errMsg) {
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    private void sharingApp(AppList.PkgInfo info, String target) {
+    public void sharingApp(AppList.PkgInfo info, String target) {
         // https://developer.android.com/training/sharing/send.html#send-binary-content
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.setType("application/octet-stream");
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + target));
+//        intent.setPackage("com.android.bluetooth");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(new File(target)));
 
         startActivityForResult(Intent.createChooser(intent, "Send To"), SHARING_ACTIVITY);
-
-//        Intent intent = new Intent(Intent.ACTION_SEND);
-//        intent.setType("message/rfc822");
-//
-//        String regEmail = Cfg.getEmail(MainActivity.this);
-//
-//        if (regEmail == null) {
-//            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{});
-//        } else {
-//            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{regEmail});
-//        }
-//
-//        intent.putExtra(Intent.EXTRA_SUBJECT, "[APK Extractor] Backup " + info.appName);
-//        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + target));
-//        // intent.putExtra(Intent.EXTRA_TEXT, "");
-//
-//        try {
-//            startActivityForResult(Intent.createChooser(intent, "Send mail..."), SHARING_ACTIVITY);
-//        } catch (ActivityNotFoundException ex) {
-//            showPopup(getString(R.string.errorEmail));
-//        }
     }
 
     private void showPopup(String msg) {
@@ -634,12 +497,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showFileExplorer() {
-        RealTimePermission.check(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, new PermissionListener() {
-            @Override
-            public void result(boolean result) {
-                Intent intent = new Intent(MainActivity.this, DirChooserActivity.class);
-                startActivityForResult(intent, DIR_ACTIVITY);
-            }
+        RunTimePermission.check(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, result -> {
+            Intent intent = new Intent(MainActivity.this, DirChooserActivity.class);
+            startActivityForResult(intent, DIR_ACTIVITY);
         });
     }
 
@@ -653,128 +513,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initData(false);
     }
 
-    private boolean getShowOption() {
-        String opt = Cfg.getShowOption(MainActivity.this);
-        if (opt.equals("0")) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private String getSortByOption() {
-        String opt = Cfg.getSortBy(MainActivity.this);
-        return opt;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    //
-    // APP ADAPTER
-    //
-    ////////////////////////////////////////////////////////////////////////////////////
-
-    class ViewHolder {
-        ImageView icon;
-        TextView name, size, pkgName, version, sd, email, delete;
-        LinearLayout btnLayout;
-        RelativeLayout row;
-    }
-
-    class PosHolder {
-        int position;
-        int type;
-        View row;
-
-        public PosHolder(int pos, int type, View row) {
-            this.position = pos;
-            this.type = type;
-            this.row = row;
-        }
-    }
-
-    class AppAdapter extends BaseAdapter {
-        public int margin;
-
-        public AppAdapter() {
-            margin = dpToPixelInt(SLIDING_MARGIN) * -1;
-        }
-
-        @Override
-        public int getCount() {
-            if (mSearchedList) {
-                if (mPkgInfoSearchedList == null) {
-                    return 0;
-                }
-
-                return mPkgInfoSearchedList.size();
-            }
-
-            return mPkgInfoList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @SuppressWarnings("deprecation")
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, null);
-
-                holder = new ViewHolder();
-                holder.icon = (ImageView) convertView.findViewById(R.id.icon);
-                holder.name = (TextView) convertView.findViewById(R.id.name);
-                holder.size = (TextView) convertView.findViewById(R.id.size);
-                holder.pkgName = (TextView) convertView.findViewById(R.id.pkgName);
-                holder.version = (TextView) convertView.findViewById(R.id.version);
-                holder.sd = (TextView) convertView.findViewById(R.id.sd);
-                holder.email = (TextView) convertView.findViewById(R.id.email);
-                holder.delete = (TextView) convertView.findViewById(R.id.delete);
-                holder.row = (RelativeLayout) convertView.findViewById(R.id.row);
-                holder.btnLayout = (LinearLayout) convertView.findViewById(R.id.btnLayout);
-
-                holder.sd.setOnClickListener(MainActivity.this);
-                holder.email.setOnClickListener(MainActivity.this);
-                holder.delete.setOnClickListener(MainActivity.this);
-                holder.row.setOnClickListener(MainActivity.this);
-
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            AppList.PkgInfo info = getPkgInfo(position);
-            if (info.icon != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    holder.icon.setBackground(info.icon);
-                } else {
-                    holder.icon.setBackgroundDrawable(info.icon);
-                }
-            }
-
-            holder.name.setText(info.appName);
-            holder.size.setText(info.appSize);
-            holder.pkgName.setText(info.pkgName);
-            holder.version.setText("(" + info.versionName + ")");
-
-            holder.sd.setTag(new PosHolder(position, ET_SDCARD, holder.row));
-            holder.email.setTag(new PosHolder(position, ET_EMAIL, holder.row));
-            holder.delete.setTag(new PosHolder(position, ET_DELETE, holder.row));
-            holder.row.setTag(new PosHolder(position, ET_MENU, holder.row));
-
-            return convertView;
-        }
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////
     //
     // View.OnClickListener
@@ -783,9 +521,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        PosHolder ph = (PosHolder) v.getTag();
+        AppAdapter.PosHolder ph = (AppAdapter.PosHolder) v.getTag();
 
-        if (ph.type == ET_MENU) {
+        if (ph.type == AppAdapter.ET_MENU) {
             if (mEdtSearch.getVisibility() != View.GONE) {
                 mEdtSearch.setVisibility(View.GONE);
                 mSearch.setVisibility(View.GONE);
@@ -795,9 +533,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 BkCfg.hideKeyboard(mEdtSearch);
             }
 
-            ((AniBtnListView) getListView()).showAnimation(v);
-        } else if (ph.type == ET_DELETE) {
-            AppList.PkgInfo info = getPkgInfo(ph.position);
+            ((AniBtnListView) getListView()).toggleMenu(v);
+        } else if (ph.type == AppAdapter.ET_DELETE) {
+            AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(ph.position);
             mDeletedPosition = ph.position;
 
             Intent intent = new Intent(Intent.ACTION_DELETE);
@@ -805,13 +543,65 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             startActivityForResult(intent, DEL_ACTIVITY);
         } else {
-            RealTimePermission.check(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
+            RunTimePermission.check(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
                 if (result) {
                     mSendEmail = ph.type != 0;
-                    sendToSd(ph.position);
+                    final AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(ph.position);
+
+                    BackupUtil.sendToSd(MainActivity.this, info, mSendEmail, new BkFile.FileCopyDetailListener() {
+                        long fileSize;
+                        private boolean cancelFlag = false;
+
+                        @Override
+                        public void onCancelled() { }
+
+                        @Override
+                        public boolean isCancelled() {
+                            return cancelFlag;
+                        }
+
+                        @Override
+                        public void onFinish(String name) {
+                            if (info.size > DialogDelegate.SHOW_PROGRESS) {
+                                sendMessage(HIDE_PROGRESS_BAR, null);
+
+                                DialogDelegate.getInstance().hideProgress(MainActivity.this);
+                            }
+
+                            if (mSendEmail) {
+                                sharingApp(info, name);
+                            } else {
+                                String fileName = BkString.getFileName(name);
+                                sendMessage(SHOW_POPUP, fileName);
+                            }
+                        }
+
+                        @Override
+                        public void onProcess(int percent) {
+                            sendMessage(UPDATE_PROGRESS_BAR, percent);
+                        }
+
+                        @Override
+                        public void onFileSize(long size) {
+                            fileSize = size;
+                        }
+
+                        @Override
+                        public long getFileSize() {
+                            return fileSize;
+                        }
+
+                        @Override
+                        public void onError(String errMsg) {
+                        }
+                    });
                 }
             });
         }
+    }
+
+    public void showProgressForCopyFile() {
+        mSdProgressBar.setVisibility(View.VISIBLE);
     }
 
     public ListView getListView() {
@@ -822,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getListView().setAdapter(adapter);
     }
 
-    public ListAdapter getListAdapter() {
-        return getListView().getAdapter();
+    public AppAdapter getListAdapter() {
+        return (AppAdapter) getListView().getAdapter();
     }
 }

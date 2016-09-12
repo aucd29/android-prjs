@@ -5,6 +5,13 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/mnu_search"/>
+
+    <item
+        android:id="@+id/mnu_search_from_mirror"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/mnu_search_from_mirror"/>
+
     <item
         android:id="@+id/mnu_showSystemApp"
         android:orderInCategory="100"

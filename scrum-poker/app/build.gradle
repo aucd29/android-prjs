@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }
 
@@ -15,6 +16,7 @@ repositories {
 }
 
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 23
@@ -23,9 +25,12 @@ android {
         applicationId "net.sarangnamu.scrum_poker"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 19
+        versionCode 1
         versionName '1.0.0'
         multiDexEnabled true
+
+        renderscriptTargetApi 19
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -35,15 +40,11 @@ android {
     }
     lintOptions {
         checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
         abortOnError false
     }
-    productFlavors {
-    }
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -51,13 +52,16 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
 
-    compile 'com.github.aucd29:common:1.0.7'
-    compile 'com.github.aucd29:ui:1.0.3'
+    compile 'com.github.aucd29:common:1.0.12'
+    compile 'com.github.aucd29:ui:1.0.4'
     compile 'com.github.aucd29:realm:1.0.0'
-    compile 'com.github.aucd29:frgmt:1.0.3'
+    compile 'com.github.aucd29:frgmt:1.0.4'
     compile 'com.github.aucd29:fonts:1.0.0'
 
-    compile 'jp.wasabeef:blurry:2.0.2'
+    compile 'com.eightbitlab:blurview:1.0.4'
+
+    compile 'com.jakewharton:butterknife:8.1.0'
+    apt 'com.jakewharton:butterknife-compiler:8.1.0'
 
 //    compile 'com.github.aucd29:ani:1.0.1'
 //    compile 'com.github.aucd29:admob:1.0.0'

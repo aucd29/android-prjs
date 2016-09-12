@@ -37,14 +37,14 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 
 public class MainFrgmt extends FrgmtBase {
     private static final Logger mLog = LoggerFactory.getLogger(MainFrgmt.class);
 
-    @Bind(R.id.grid) GridView mGrid;
+    @BindView(R.id.grid) GridView mGrid;
     private ArrayList<String> mDefaultValue;
 
     @Override
@@ -112,7 +112,7 @@ public class MainFrgmt extends FrgmtBase {
     ////////////////////////////////////////////////////////////////////////////////////
 
     static class ViewHolder {
-        @Bind(R.id.number) TextView number;
+        @BindView(R.id.number) TextView number;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

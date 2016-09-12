@@ -26,6 +26,7 @@
     <!-- MENU -->
     <string name="mnu_email">Set E-mail Addr</string>
     <string name="mnu_search">Search</string>
+    <string name="mnu_search_from_mirror">Search from apkmirror.com</string>
     <string name="mnu_showAllApps">Show All Apps</string>
     <string name="mnu_showInstalledApps">Show Installed Apps</string>
     <string name="mnu_setSdPath">Set SD Path</string>

@@ -26,6 +26,10 @@ import net.sarangnamu.common.ui.grid.edit.EditGridView;
 import net.sarangnamu.scrum_poker.R;
 import net.sarangnamu.scrum_poker.cfg.Cfg;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -33,15 +37,15 @@ import android.widget.Toast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.OnClick;
 
 public class AddFrgmt extends FrgmtBase {
     private static final Logger mLog = LoggerFactory.getLogger(AddFrgmt.class);
 
-    @Bind(R.id.edtTitle) EditText mEdtTitle;
-    @Bind(R.id.submit)   ImageButton mSubmit;
-    @Bind(R.id.grid)     EditGridView mGrid;
+    @BindView(R.id.edtTitle) EditText mEdtTitle;
+    @BindView(R.id.submit)   ImageButton mSubmit;
+    @BindView(R.id.grid)     EditGridView mGrid;
 
     @Override
     protected int getLayoutId() {

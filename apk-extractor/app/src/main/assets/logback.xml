@@ -38,7 +38,7 @@
     -->
     <!-- Write INFO (and higher-level) messages to the log file -->
 
-    <root level="debug" >
+    <root level="error" >
         <!--
        <root level="ERROR|TRACE">
 		trace
