@@ -25,6 +25,7 @@ import net.sarangnamu.common.BkApp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2016. 9. 1.. <p/>
@@ -97,22 +98,25 @@ public class AppListManager {
 
     public void removeDataListAndRefereshList(AppList.PkgInfo pkgInfo) {
         if (mPkgInfoSearchedList != null && mPkgInfoSearchedList.size() > 0) {
-            for (AppList.PkgInfo info : mPkgInfoSearchedList) {
+            for (Iterator<AppList.PkgInfo> it = mPkgInfoSearchedList.iterator(); it.hasNext(); ) {
+                AppList.PkgInfo info = it.next();
+
                 if (info.equals(pkgInfo)) {
-                    mPkgInfoSearchedList.remove(info);
+                    it.remove();
                 }
             }
         }
 
         if (mPkgInfoList != null && mPkgInfoList.size() > 0) {
-            for (AppList.PkgInfo info : mPkgInfoList) {
+            for (Iterator<AppList.PkgInfo> it = mPkgInfoList.iterator(); it.hasNext(); ) {
+                AppList.PkgInfo info = it.next();
+
                 if (info.equals(pkgInfo)) {
-                    mPkgInfoList.remove(info);
+                    it.remove();
                 }
             }
         }
     }
-
 
     public void resetSearchedList() {
         mPkgInfoSearchedList.clear();
