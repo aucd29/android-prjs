@@ -3,7 +3,6 @@ package net.sarangnamu.apk_extractor;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -554,15 +553,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(intent, DEL_ACTIVITY);
         } else {
             RunTimePermission.check(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
-//                if (AppListManager.getInstance().isSearchedList()) {
-//                    AppListManager.getInstance().resetSearchedList();
-//                    notifyDataSetChanged();
-//
-//                    if (mEdtSearch.getVisibility() != View.GONE) {
-//                        setSearchUi();
-//                    }
-//                }
-
                 if (result) {
                     mSendEmail = ph.type != 0;
                     final AppList.PkgInfo info = AppListManager.getInstance().getPkgInfo(ph.position);

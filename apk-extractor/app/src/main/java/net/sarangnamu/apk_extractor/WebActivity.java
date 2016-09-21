@@ -20,19 +20,17 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.webkit.DownloadListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import net.sarangnamu.apk_extractor.model.Cfg;
 import net.sarangnamu.common.BkString;
-import net.sarangnamu.common.permission.PermissionListener;
 import net.sarangnamu.common.permission.RunTimePermission;
 
 import java.io.File;
 import java.io.IOException;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -49,7 +47,7 @@ import okio.Okio;
 public class WebActivity extends AppCompatActivity {
     private static final org.slf4j.Logger mLog = org.slf4j.LoggerFactory.getLogger(WebActivity.class);
 
-    @Bind(R.id.web)
+    @BindView(R.id.web)
     WebView mWeb;
 
     @SuppressLint("SetJavaScriptEnabled")

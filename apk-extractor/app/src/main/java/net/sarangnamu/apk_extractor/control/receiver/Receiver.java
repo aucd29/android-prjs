@@ -86,11 +86,15 @@ public class Receiver extends BroadcastReceiver {
     }
 
     private boolean isForegroundApp(Context context) {
-        String[] activePackages;
+        String[] activePackages = null;
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
             activePackages = getActivePackages(context);
         } else {
-            activePackages = getActivePackagesCompat(context);
+            try {
+                activePackages = getActivePackagesCompat(context);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         if (activePackages != null) {

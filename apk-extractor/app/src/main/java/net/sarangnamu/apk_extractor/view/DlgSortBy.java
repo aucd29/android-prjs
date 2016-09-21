@@ -5,24 +5,25 @@
  */
 package net.sarangnamu.apk_extractor.view;
 
+import android.content.Context;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
 import net.sarangnamu.apk_extractor.R;
 import net.sarangnamu.apk_extractor.model.Cfg;
 import net.sarangnamu.common.admob.AdMobDecorator;
 import net.sarangnamu.common.fonts.FontLoader;
 import net.sarangnamu.common.ui.dlg.DlgBase;
-import android.content.Context;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DlgSortBy extends DlgBase {
-    @Bind(R.id.sortGroup) RadioGroup mGroup;
-    @Bind(R.id.alphabetAsc) RadioButton mAlphabetAsc;
-    @Bind(R.id.alphabetDesc) RadioButton mAlphabetDesc;
-    @Bind(R.id.firstInstallTime) RadioButton mFirstInstallTime;
-    @Bind(R.id.lastInstallTime) RadioButton mLastInstallTime;
+    @BindView(R.id.sortGroup) RadioGroup mGroup;
+    @BindView(R.id.alphabetAsc) RadioButton mAlphabetAsc;
+    @BindView(R.id.alphabetDesc) RadioButton mAlphabetDesc;
+    @BindView(R.id.firstInstallTime) RadioButton mFirstInstallTime;
+    @BindView(R.id.lastInstallTime) RadioButton mLastInstallTime;
 
     public DlgSortBy(Context context) {
         super(context);
