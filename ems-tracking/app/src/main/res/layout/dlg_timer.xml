@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="380dp"
+                xmlns:tools="http://schemas.android.com/tools" android:layout_width="380dp"
     android:layout_height="100dp"
     android:layout_centerInParent="true"
     android:background="@drawable/popup_bg"
@@ -13,7 +13,7 @@
         android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:minHeight="80dp"
-        android:orientation="vertical" >
+        android:orientation="vertical" tools:ignore="UseCompoundDrawables,UselessParent">
 
         <ImageView
             android:layout_width="25.5dp"

@@ -17,8 +17,8 @@
  */
 package net.sarangnamu.ems_tracking;
 
-import net.sarangnamu.common.admob.AdMobDecorator;
 import net.sarangnamu.common.ui.StatusBar;
+import net.sarangnamu.ems_tracking.ad.AdmobDecorator;
 import net.sarangnamu.ems_tracking.api.xml.Ems;
 import net.sarangnamu.ems_tracking.api.xml.Ems.EmsData;
 import net.sarangnamu.ems_tracking.cfg.Cfg;
@@ -33,7 +33,6 @@ import android.widget.TextView;
 
 public class Detail extends Activity {
     private Ems mEms;
-    private EmsHistory mAdapter;
 
     private TextView mEmsNum, mDetail;
     private ListView mList;
@@ -63,7 +62,7 @@ public class Detail extends Activity {
 
     @Override
     protected void onDestroy() {
-        AdMobDecorator.getInstance().destroy();
+        AdmobDecorator.getInstance().destroy();
 
         super.onDestroy();
     }
@@ -83,11 +82,11 @@ public class Detail extends Activity {
     }
 
     private void initAdView() {
-        AdMobDecorator.getInstance().load(this, R.id.adView);
+        AdmobDecorator.getInstance().load(this, R.id.adView);
     }
 
     private void initListView() {
-        mAdapter = new EmsHistory();
+        EmsHistory mAdapter = new EmsHistory();
         mList.setAdapter(mAdapter);
     }
 

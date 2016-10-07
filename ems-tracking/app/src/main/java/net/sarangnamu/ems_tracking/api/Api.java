@@ -43,7 +43,7 @@ public class Api {
         initHttp();
         mHttp.setMethod("POST");
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("typeApp", "postSearch");
         params.put("typeSmart", "A");
         params.put("ver", VERSION);

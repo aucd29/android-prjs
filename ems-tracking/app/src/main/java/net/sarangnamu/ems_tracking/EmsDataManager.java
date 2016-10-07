@@ -48,12 +48,12 @@ public class EmsDataManager {
     }
 
     public interface EmsDataListener {
-        public void onEmsData(Ems ems);
+        void onEmsData(Ems ems);
     }
 
     public void getAsyncEmsData(final MainActivity act, final String num, final EmsDataListener l) {
         if (mEmsData == null) {
-            mEmsData = new HashMap<String, Ems>();
+            mEmsData = new HashMap<>();
         }
 
         Ems ems = mEmsData.get(num);
@@ -101,8 +101,6 @@ public class EmsDataManager {
     public Ems getEmsData(String ems) {
         try {
             return mEmsData.get(ems);
-        } catch (NullPointerException e) {
-            mLog.error(e.getMessage());
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
@@ -112,7 +110,7 @@ public class EmsDataManager {
 
     public void setEmsData(String num, Ems ems) {
         if (mEmsData == null) {
-            mEmsData = new HashMap<String, Ems>();
+            mEmsData = new HashMap<>();
         }
 
         mEmsData.put(num, ems);

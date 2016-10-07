@@ -29,8 +29,9 @@ import org.slf4j.LoggerFactory;
 public class Ems extends XPathParser {
     private static final Logger mLog = LoggerFactory.getLogger(Ems.class);
 
-    public String mEmsNum, mTmpNum;
-    public ArrayList<EmsData> mEmsData = new ArrayList<EmsData>();
+    public String mEmsNum;
+    public final String mTmpNum;
+    public ArrayList<EmsData> mEmsData = new ArrayList<>();
     public String mErrMsg;
 
     public Ems(String ems, String emsNum) {
@@ -43,7 +44,7 @@ public class Ems extends XPathParser {
     @Override
     protected void parsing() throws Exception {
         if (mEmsData == null) {
-            mEmsData = new ArrayList<EmsData>();
+            mEmsData = new ArrayList<>();
         }
 
         /*
@@ -176,17 +177,16 @@ public class Ems extends XPathParser {
     }
 
     public void trace() {
-        StringBuilder log = new StringBuilder();
-        log.append("===================================================================\n");
-        log.append("EMS DATA INFO\n");
-        log.append("===================================================================\n");
-        log.append("ems number : " + mEmsNum);
+        String log = "===================================================================\n" +
+                "EMS DATA INFO\n" +
+                "===================================================================\n" +
+                "ems number : " + mEmsNum;
 
         for (EmsData data : mEmsData) {
             data.trace();
         }
 
-        mLog.debug(log.toString());
+        mLog.debug(log);
     }
 
     public class EmsData {
@@ -219,12 +219,11 @@ public class Ems extends XPathParser {
         }
 
         public void trace() {
-            StringBuilder log = new StringBuilder();
-            log.append("date   : ").append(date).append("\n");
-            log.append("status : ").append(status).append("\n");
-            log.append("office : ").append(office).append("\n");
-            log.append("detail : ").append(detail).append("\n");
-            mLog.debug(log.toString());
+            String log = "date   : " + date + "\n" +
+                    "status : " + status + "\n" +
+                    "office : " + office + "\n" +
+                    "detail : " + detail + "\n";
+            mLog.debug(log);
         }
     }
 }

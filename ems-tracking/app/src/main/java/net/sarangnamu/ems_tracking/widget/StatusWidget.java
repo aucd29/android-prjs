@@ -35,7 +35,6 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 public class StatusWidget extends AppWidgetProvider {
-    private static final String TAG = "StatusWidget";
     public static final String BTN_REFRESH = "btnRefresh";
 
     @Override
@@ -44,8 +43,7 @@ public class StatusWidget extends AppWidgetProvider {
 
         DbManager.getInstance().open(context, new EmsDbHelper(context));
 
-        for (int i=0; i<N; i++) {
-            final int appWidgetId = appWidgetIds[i];
+        for (final int appWidgetId : appWidgetIds) {
             final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
             views.setOnClickPendingIntent(R.id.widgetLayout, getPendingSelfIntent(context, BTN_REFRESH, appWidgetId));

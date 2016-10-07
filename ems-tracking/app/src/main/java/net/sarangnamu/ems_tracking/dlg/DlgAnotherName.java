@@ -28,8 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class DlgAnotherName extends DlgBase {
-    private Button mBtn;
-    private String mEmsNum;
+    private final String mEmsNum;
     private EditText mEdit;
     private String mAnotherName;
 
@@ -47,19 +46,16 @@ public class DlgAnotherName extends DlgBase {
 
     @Override
     protected void initLayout() {
-        mBtn     = (Button) findViewById(R.id.btn);
+        Button mBtn = (Button) findViewById(R.id.btn);
         mEdit    = (EditText) findViewById(R.id.edit);
 
         mEdit.setTypeface(FontLoader.getInstance(getContext()).getFont("Roboto-Light"));
         mBtn.setTypeface(FontLoader.getInstance(getContext()).getFont("Roboto-Light"));
-        mBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String text = mEdit.getText().toString();
-                Cfg.setAnotherName(getContext(), mEmsNum, text);
-                BkCfg.hideKeyboard(mEdit);
-                dismiss();
-            }
+        mBtn.setOnClickListener(v -> {
+            String text = mEdit.getText().toString();
+            Cfg.setAnotherName(getContext(), mEmsNum, text);
+            BkCfg.hideKeyboard(mEdit);
+            dismiss();
         });
 
         if (mAnotherName != null) {

@@ -25,11 +25,8 @@ public class Cfg extends BkCfg {
     private static final String OPT_NAME = "OPT_NAME";
 
     public static boolean isEmsNumber(String num) {
-        if (!num.matches("[a-zA-Z]{1}[0-9a-zA-Z]{12}")) {
-            return false;
-        }
+        return num.matches("[a-zA-Z]{1}[0-9a-zA-Z]{12}");
 
-        return true;
     }
 
     public static void setAnotherName(Context context, String emsNum, String name) {
@@ -45,10 +42,7 @@ public class Cfg extends BkCfg {
     }
 
     public static boolean getOptionName(Context context) {
-        if (get(context, OPT_NAME, "1").equals("0")) {
-            return false;
-        }
+        return !get(context, OPT_NAME, "1").equals("0");
 
-        return true;
     }
 }

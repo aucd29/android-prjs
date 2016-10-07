@@ -2,14 +2,12 @@ package net.sarangnamu.scrum_poker;
 
 import java.util.ArrayList;
 
-import net.sarangnamu.common.BkActivity;
 import net.sarangnamu.scrum_poker.db.DbHelper;
 import net.sarangnamu.scrum_poker.page.PageManager;
 import net.sarangnamu.scrum_poker.page.sub.AddFrgmt;
 import net.sarangnamu.scrum_poker.page.sub.MainFrgmt;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -165,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
     private void initFloatingActionButton() {
         mFab.setOnClickListener(v -> {
             setAddButtonAlpha(0);
-            PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class, null);
+            PageManager.getInstance(MainActivity.this).replace(R.id.content_frame, AddFrgmt.class);
         });
     }
 

@@ -24,12 +24,10 @@ import net.sarangnamu.common.ani.Resize;
 import net.sarangnamu.common.ani.Resize.ResizeAnimationListener;
 import net.sarangnamu.common.fonts.FontLoader;
 import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.common.ui.dlg.DlgBtnBase.DlgBtnListener;
 import net.sarangnamu.common.ui.dlg.DlgLicense;
 import net.sarangnamu.common.ui.dlg.DlgNormal;
 import net.sarangnamu.common.ui.dlg.DlgTimer;
 import net.sarangnamu.common.ui.list.AniBtnListView;
-import net.sarangnamu.ems_tracking.EmsDataManager.EmsDataListener;
 import net.sarangnamu.ems_tracking.api.Api;
 import net.sarangnamu.ems_tracking.api.xml.Ems;
 import net.sarangnamu.ems_tracking.cfg.Cfg;
@@ -96,33 +94,32 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
     private void initLabel() {
-        mTitle.setText(Html.fromHtml(getString(R.string.appName)));
-        mAddBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String num = mEmsNum.getText().toString();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            mTitle.setText(Html.fromHtml(getString(R.string.appName), Html.FROM_HTML_MODE_COMPACT));
+        } else {
+            mTitle.setText(Html.fromHtml(getString(R.string.appName)));
+        }
 
-                if (num == null || num.length() < 1) {
-                    showPopup(getString(R.string.plsInputNum));
-                    return;
-                }
+        mAddBtn.setOnClickListener(v -> {
+            final String num = mEmsNum.getText().toString();
 
-                if (!Cfg.isEmsNumber(num)) {
-                    showPopup(getString(R.string.invalidEmsNum));
-                    return;
-                }
-
-                trackingAndInsertDB(num);
-                Cfg.setAnotherName(getApplicationContext(), num.toUpperCase(), mAnotherName.getText().toString());
+            if (num.length() < 1) {
+                showPopup(getString(R.string.plsInputNum));
+                return;
             }
+
+            if (!Cfg.isEmsNumber(num)) {
+                showPopup(getString(R.string.invalidEmsNum));
+                return;
+            }
+
+            trackingAndInsertDB(num);
+            Cfg.setAnotherName(getApplicationContext(), num.toUpperCase(), mAnotherName.getText().toString());
         });
 
-        mRefreshBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mRefreshBtn.setEnabled(false);
-                loadEmsData();
-            }
+        mRefreshBtn.setOnClickListener(v -> {
+            mRefreshBtn.setEnabled(false);
+            loadEmsData();
         });
 
         mEmsNum.addTextChangedListener(new TextWatcher() {
@@ -366,18 +363,15 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
     private void showDetail(final String emsNum) {
-        EmsDataManager.getInstance().getAsyncEmsData(this, emsNum, new EmsDataListener() {
-            @Override
-            public void onEmsData(Ems ems) {
-                if (ems == null) {
-                    mLog.error("ems == null");
-                    return ;
-                }
-
-                Intent intent = new Intent(MainActivity.this, Detail.class);
-                intent.putExtra(EmsDataManager.EMS_NUM, ems.mEmsNum);
-                startActivity(intent);
+        EmsDataManager.getInstance().getAsyncEmsData(this, emsNum, ems -> {
+            if (ems == null) {
+                mLog.error("ems == null");
+                return ;
             }
+
+            Intent intent = new Intent(MainActivity.this, Detail.class);
+            intent.putExtra(EmsDataManager.EMS_NUM, ems.mEmsNum);
+            startActivity(intent);
         });
     }
 
@@ -414,8 +408,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
     class DetailType {
-        String emsNum;
-        View row;
+        final String emsNum;
+        final View row;
 
         DetailType(String emsNum, View row) {
             this.emsNum = emsNum;
@@ -424,8 +418,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     }
 
     class TagBase {
-        int id;
-        String emsNum;
+        final int id;
+        final String emsNum;
 
         TagBase(int id, String emsNum) {
             this.id = id;
@@ -510,7 +504,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v instanceof RelativeLayout) {
-            ((AniBtnListView) getListView()).showAnimation(v);
+            ((AniBtnListView) getListView()).toggleMenu(v);
         } else if (v instanceof TextView) {
             final Object obj = v.getTag();
 
@@ -518,26 +512,21 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 DlgNormal dlg = new DlgNormal(this);
                 dlg.setCancelable(false);
                 dlg.setMessage(R.string.deleteMsg);
-                dlg.setOnBtnListener(new DlgBtnListener() {
-                    @Override
-                    public void ok() {
-                        DeleteType typeObj = (DeleteType) obj;
-                        int id = typeObj.id;
-                        if (id != 0) {
-                            deleteItem(id);
-                        }
-
-                        Cfg.setAnotherName(MainActivity.this, typeObj.emsNum, "");
+                dlg.setOnBtnListener(() -> {
+                    DeleteType typeObj = (DeleteType) obj;
+                    int id = typeObj.id;
+                    if (id != 0) {
+                        deleteItem(id);
                     }
+
+                    Cfg.setAnotherName(MainActivity.this, typeObj.emsNum, "");
                 });
                 dlg.show();
                 dlg.hideTitle();
                 dlg.setDialogSize(dpToPixelInt(330), -1);
             } else if (obj instanceof DetailType) {
                 final DetailType type = (DetailType) obj;
-                if (type != null) {
-                    showDetail(type.emsNum);
-                }
+                showDetail(type.emsNum);
             } else if (obj instanceof ModifyType) {
                 ModifyType typeObj = (ModifyType) obj;
 

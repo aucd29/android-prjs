@@ -15,6 +15,7 @@ repositories {
     mavenCentral()
 }
 
+apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'android-apt'
 
@@ -27,7 +28,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName '1.0.0'
-        multiDexEnabled true
+//        multiDexEnabled true
 
         renderscriptTargetApi 19
         renderscriptSupportModeEnabled true
@@ -52,11 +53,11 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
 
-    compile 'com.github.aucd29:common:1.0.12'
-    compile 'com.github.aucd29:ui:1.0.4'
+    compile 'com.github.aucd29:common:1.0.14'
+    compile 'com.github.aucd29:ui:1.0.5'
     compile 'com.github.aucd29:realm:1.0.0'
-    compile 'com.github.aucd29:frgmt:1.0.4'
-    compile 'com.github.aucd29:fonts:1.0.0'
+    compile 'com.github.aucd29:frgmt:1.0.5'
+    compile 'com.github.aucd29:fonts:1.0.1'
 
     compile 'com.eightbitlab:blurview:1.0.4'
 

@@ -46,7 +46,7 @@ public class EmsDbHelper extends DbHelperBase {
     public EmsDbHelper(Context context) {
         super(context, DB_NAME, VERSION);
 
-        mTables = new HashMap<String, String>();
+        mTables = new HashMap<>();
         mTables.put(Columns.TABLE, Columns.CREATE);
     }
 
@@ -70,9 +70,7 @@ public class EmsDbHelper extends DbHelperBase {
             values.put(Columns.OFFICE, emsData.office);
             values.put(Columns.DETAIL, emsData.detail);
 
-            return DbManager.getInstance().insert(Columns.TABLE, values) > 0 ? true : false;
-        } catch (NullPointerException e) {
-            mLog.error(e.getMessage());
+            return DbManager.getInstance().insert(Columns.TABLE, values) > 0;
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
@@ -98,8 +96,6 @@ public class EmsDbHelper extends DbHelperBase {
             }
 
             return res > 0 ? true : false;
-        } catch (NullPointerException e) {
-            mLog.error(e.getMessage());
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
@@ -110,9 +106,7 @@ public class EmsDbHelper extends DbHelperBase {
     public static boolean delete(int id) {
         try {
             int res = DbManager.getInstance().delete(Columns.TABLE, "_id=" + id);
-            return res > 0 ? true : false;
-        } catch (NullPointerException e) {
-            mLog.error(e.getMessage());
+            return res > 0;
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
