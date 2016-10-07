@@ -60,6 +60,9 @@ import android.widget.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends ListActivity implements View.OnClickListener {
     private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
 
@@ -68,12 +71,22 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     private int mModifyId = -1;
     private boolean mExpandLayoutId = false;
 
-    private Button mAddBtn;
-    private TextView mTitle, mEmpty;
-    private EditText mEmsNum, mAnotherName;
+    @BindView(R.id.add)
+    Button mAddBtn;
+    @BindView(R.id.title)
+    TextView mTitle;
+    @BindView(android.R.id.empty)
+    TextView mEmpty;
+    @BindView(R.id.emsNum)
+    EditText mEmsNum;
+    @BindView(R.id.anotherName)
+    EditText mAnotherName;
+    @BindView(R.id.refersh)
+    ImageButton mRefreshBtn;
+    @BindView(R.id.editLayout)
+    RelativeLayout mEditLayout;
+
     private EmsAdapter mAdapter;
-    private ImageButton mRefreshBtn;
-    private RelativeLayout mEditLayout;
     private ProgressDialog mDlg;
 
     @Override
@@ -81,13 +94,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAddBtn      = (Button) findViewById(R.id.add);
-        mTitle       = (TextView) findViewById(R.id.title);
-        mEmpty       = (TextView) findViewById(android.R.id.empty);
-        mEmsNum      = (EditText) findViewById(R.id.emsNum);
-        mAnotherName = (EditText) findViewById(R.id.anotherName);
-        mEditLayout  = (RelativeLayout) findViewById(R.id.editLayout);
-        mRefreshBtn  = (ImageButton) findViewById(R.id.refersh);
+        ButterKnife.bind(this);
 
         initLabel();
         initData();
@@ -271,8 +278,8 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             hideAnotherName();
 
             mModifyId = -1;
-            ((Button)findViewById(R.id.add)).setText(R.string.add);
-            ((TextView) findViewById(R.id.emsNum)).setText("");
+            mAddBtn.setText(R.string.add);
+            mEmsNum.setText("");
         } else {
             super.onBackPressed();
         }
@@ -448,15 +455,15 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         public void bindView(View view, Context context, Cursor cr) {
             ViewHolder vh = new ViewHolder();
 
-            vh.emsNum       = (TextView) view.findViewById(R.id.emsNum);
-            vh.date         = (TextView) view.findViewById(R.id.date);
-            vh.status       = (TextView) view.findViewById(R.id.status);
-            vh.office       = (TextView) view.findViewById(R.id.office);
-            vh.delete       = (TextView) view.findViewById(R.id.delete);
-            vh.detail       = (TextView) view.findViewById(R.id.detail);
-            vh.modify       = (TextView) view.findViewById(R.id.modify);
-            vh.btnLayout    = (LinearLayout) view.findViewById(R.id.btnLayout);
-            vh.row          = (RelativeLayout) view.findViewById(R.id.row);
+            vh.emsNum       = ButterKnife.findById(view, R.id.emsNum);
+            vh.date         = ButterKnife.findById(view, R.id.date);
+            vh.status       = ButterKnife.findById(view, R.id.status);
+            vh.office       = ButterKnife.findById(view, R.id.office);
+            vh.delete       = ButterKnife.findById(view, R.id.delete);
+            vh.detail       = ButterKnife.findById(view, R.id.detail);
+            vh.modify       = ButterKnife.findById(view, R.id.modify);
+            vh.btnLayout    = ButterKnife.findById(view, R.id.btnLayout);
+            vh.row          = ButterKnife.findById(view, R.id.row);
 
             int pos = 0;
             int id  = cr.getInt(pos++);

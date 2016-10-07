@@ -31,11 +31,21 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class Detail extends Activity {
     private Ems mEms;
 
-    private TextView mEmsNum, mDetail;
-    private ListView mList;
+    @BindView(R.id.emsNum)
+    TextView mEmsNum;
+    @BindView(R.id.detail)
+    TextView mDetail;
+    @BindView(R.id.shipped_to_apply)
+    TextView mShippedToApply;
+    @BindView(R.id.list)
+    ListView mList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +59,7 @@ public class Detail extends Activity {
 
         setContentView(R.layout.detail);
 
-        mEmsNum   = (TextView) findViewById(R.id.emsNum);
-        mDetail   = (TextView) findViewById(R.id.detail);
-        mList     = (ListView) findViewById(R.id.list);
+        ButterKnife.bind(this);
 
         initLabel();
         initAdView();
@@ -79,6 +87,10 @@ public class Detail extends Activity {
             mEmsNum.setText(anotherName);
             mDetail.setText(mEms.mEmsNum);
         }
+
+        mShippedToApply.setOnClickListener(v -> {
+
+        });
     }
 
     private void initAdView() {

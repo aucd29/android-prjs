@@ -22,5 +22,6 @@
     <string name="hideDlgForAnotherName">Hide Dialog for a Another Name</string>
     <string name="modify">Modify</string>
     <string name="license">License</string>
+    <string name="shipped_to_apply">Shipped to apply</string>
 
 </resources>

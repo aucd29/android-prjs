@@ -21,5 +21,6 @@
     <string name="hideDlgForAnotherName">물품명 설정 숨기기</string>
     <string name="modify">수정</string>
     <string name="license">라이센스</string>
+    <string name="shipped_to_apply">배송완료 적용</string>
 
 </resources>

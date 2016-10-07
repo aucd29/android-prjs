@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:ads="http://schemas.android.com/apk/res-auto"
+              xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/emsNum"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/dBg"
-        android:gravity="center"
-        android:padding="5dp"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+    <FrameLayout android:layout_width="match_parent"
+                 android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/emsNum"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/dBg"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/shipped_to_apply"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@drawable/btn_shipped_to_apply_selector"
+            android:text="@string/shipped_to_apply"
+            android:textColor="@android:color/white"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:textSize="9sp"
+            android:clickable="true"
+            android:layout_gravity="right" tools:ignore="RtlHardcoded"/>
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/detail"
@@ -23,7 +41,7 @@
         android:gravity="center"
         android:padding="5dp"
         android:text="@string/detailedInfo"
-        android:textSize="13sp" />
+        android:textSize="13sp"/>
 
     <LinearLayout
         android:id="@+id/adLayout"
@@ -45,6 +63,6 @@
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:listSelector="@drawable/list_empty_selector" />
+        android:listSelector="@drawable/list_empty_selector"/>
 
 </LinearLayout>
