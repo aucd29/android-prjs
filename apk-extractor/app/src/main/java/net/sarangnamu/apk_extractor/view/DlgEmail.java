@@ -1,6 +1,5 @@
 /*
- * DlgEmail.java
- * Copyright 2013 Burke Choi All rights reserved.
+ * Copyright 2016 Burke Choi All rights reserved.
  *             http://www.sarangnamu.net
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
