@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+// 사용자에게 입력받은 ems number 를 db 에 넣고 서버에 상태 값을 전달 받은 뒤 그 결과를 db 내용에 갱신
 public class EmsDataManager {
     private static final Logger mLog = LoggerFactory.getLogger(EmsDataManager.class);
 

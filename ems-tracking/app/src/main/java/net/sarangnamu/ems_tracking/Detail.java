@@ -44,10 +44,13 @@ public class Detail extends AppCompatActivity {
 
     @BindView(R.id.emsNum)
     TextView mEmsNum;
+
     @BindView(R.id.detail)
     TextView mDetail;
+
     @BindView(R.id.shipped_to_apply)
     TextView mShippedToApply;
+
     @BindView(R.id.list)
     ListView mList;
 
