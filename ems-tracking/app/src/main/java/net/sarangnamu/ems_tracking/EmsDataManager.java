@@ -17,23 +17,25 @@
  */
 package net.sarangnamu.ems_tracking;
 
-import java.util.HashMap;
+import android.os.AsyncTask;
 
 import net.sarangnamu.ems_tracking.api.Api;
 import net.sarangnamu.ems_tracking.api.xml.Ems;
 import net.sarangnamu.ems_tracking.db.EmsDbHelper;
-import android.os.AsyncTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class EmsDataManager {
     private static final Logger mLog = LoggerFactory.getLogger(EmsDataManager.class);
 
     public static final String EMS_NUM = "emsNum";
+    public static final String EMS_PRIMARY_KEY = "id";
 
     private static EmsDataManager sInst;
-    private HashMap<String, Ems> mEmsData;
+    private HashMap<String, Ems> mEmsMap;
 
     public static EmsDataManager getInstance() {
         if (sInst == null) {
@@ -52,11 +54,11 @@ public class EmsDataManager {
     }
 
     public void getAsyncEmsData(final MainActivity act, final String num, final EmsDataListener l) {
-        if (mEmsData == null) {
-            mEmsData = new HashMap<>();
+        if (mEmsMap == null) {
+            mEmsMap = new HashMap<>();
         }
 
-        Ems ems = mEmsData.get(num);
+        Ems ems = mEmsMap.get(num);
         if (ems == null) {
             new AsyncTask<Void, Void, Boolean>() {
                 Ems ems;
@@ -72,7 +74,7 @@ public class EmsDataManager {
                         ems = Api.tracking(num);
                         setEmsData(num, ems);
 
-                        EmsDbHelper.update(0, ems);
+                        EmsDbHelper.update(0, ems, null);
                     } catch (Exception e) {
                         mLog.error(e.getMessage());
 
@@ -98,9 +100,9 @@ public class EmsDataManager {
         }
     }
 
-    public Ems getEmsData(String ems) {
+    public Ems getEmsData(String emsNumber) {
         try {
-            return mEmsData.get(ems);
+            return mEmsMap.get(emsNumber);
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
@@ -109,10 +111,10 @@ public class EmsDataManager {
     }
 
     public void setEmsData(String num, Ems ems) {
-        if (mEmsData == null) {
-            mEmsData = new HashMap<>();
+        if (mEmsMap == null) {
+            mEmsMap = new HashMap<>();
         }
 
-        mEmsData.put(num, ems);
+        mEmsMap.put(num, ems);
     }
 }

@@ -13,7 +13,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
 package net.sarangnamu.scroll_capture;
@@ -79,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.options)
     ImageView mOptions;
 
-    @BindView(R.id.fab)
-    FloatingActionButton mFab;
+//    @BindView(R.id.fab)
+//    FloatingActionButton mFab;
 
     @BindView(R.id.progress)
     ProgressBar mProgress;
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (url.equals("http://aucd29.tistory.com/")) {
                     mProgress.setVisibility(View.GONE);
-                    mFab.animate().alpha(1);
+//                    mFab.animate().alpha(1);
                 }
             }
 
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (url.equals("http://aucd29.tistory.com/")) {
                     mProgress.setVisibility(View.VISIBLE);
-                    mFab.animate().alpha(0);
+//                    mFab.animate().alpha(0);
                 }
             }
 
@@ -155,96 +154,105 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.fab)
+//    @OnClick(R.id.fab)
     void fabClick() {
         RunTimePermission.check(this, new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, result -> {
             if (!result) {
                 return ;
             }
 
-            mProgress.setVisibility(View.VISIBLE);
-            BkCfg.hideKeyboard(mUrl);
-
-            if (mLog.isDebugEnabled()) {
-                String log = "";
-                log += "===================================================================\n";
-                log += "CAPTURE START\n";
-                log += "===================================================================\n";
-                mLog.debug(log);
-            }
-
-            new AsyncTask<Object, Integer, Boolean>() {
-                Bitmap mBmp;
-
-                @Override
-                protected void onPreExecute() {
-                    int w, h;
-                    try {
-                        Picture pic = mWeb.capturePicture();
-
-                        w = pic.getWidth();
-                        h = pic.getHeight();
-                    } catch (Exception e) {
-                        w = mWeb.getMeasuredWidth();
-                        h = mWeb.getMeasuredHeight();
-                    }
-
-                    mWeb.measure(View.MeasureSpec.makeMeasureSpec(
-                            View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
-                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-                    mBmp = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
-
-                    Canvas canvas = new Canvas(mBmp);
-                    mWeb.draw(canvas);
-                }
-
-                @Override
-                protected Boolean doInBackground(Object... objects) {
-                    Context context = (Context) objects[0];
-
-                    File dnPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    File ssPath = new File(dnPath, "screenshot");
-                    if (!ssPath.exists()) {
-                        ssPath.mkdirs();
-                    }
-
-                    String fileName = "test.png"; // DateFormat.format("yyyyMMdd-HHmmss", new Date()) + ".png";
-                    File ssFile = new File(ssPath, fileName);
-
-                    try {
-                        FileOutputStream os = new FileOutputStream(ssFile);
-                        mBmp.compress(Bitmap.CompressFormat.PNG, 90, os);
-                        os.flush();
-                        os.close();
-
-                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + ssFile.getAbsolutePath())));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    return true;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean result) {
-                    if (mBmp != null) {
-                        mBmp.recycle();
-                        mBmp = null;
-                    }
-
-                    if (mLog.isDebugEnabled()) {
-                        String log = "";
-                        log += "===================================================================\n";
-                        log += "CAPTURE END\n";
-                        log += "===================================================================\n";
-                        mLog.debug(log);
-                    }
-
-                    mProgress.setVisibility(View.GONE);
-                }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MainActivity.this);
+            scrollCapture();
         });
     }
+
+    private void scrollCapture() {
+        mProgress.setVisibility(View.VISIBLE);
+        BkCfg.hideKeyboard(mUrl);
+
+        if (mLog.isDebugEnabled()) {
+            String log = "";
+            log += "===================================================================\n";
+            log += "CAPTURE START\n";
+            log += "===================================================================\n";
+            mLog.debug(log);
+        }
+
+        new AsyncTask<Object, Integer, Boolean>() {
+            Bitmap mBmp;
+
+            @Override
+            protected void onPreExecute() {
+                int w, h;
+                try {
+                    Picture pic = mWeb.capturePicture();
+
+                    w = pic.getWidth();
+                    h = pic.getHeight();
+                } catch (Exception e) {
+                    w = mWeb.getMeasuredWidth();
+                    h = mWeb.getMeasuredHeight();
+                }
+
+                mWeb.measure(View.MeasureSpec.makeMeasureSpec(
+                        View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED),
+                        View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                mBmp = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
+
+                Canvas canvas = new Canvas(mBmp);
+                mWeb.draw(canvas);
+            }
+
+            @Override
+            protected Boolean doInBackground(Object... objects) {
+                Context context = (Context) objects[0];
+
+                File dnPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File ssPath = new File(dnPath, "screenshot");
+                if (!ssPath.exists()) {
+                    ssPath.mkdirs();
+                }
+
+                String fileName = "test.png"; // DateFormat.format("yyyyMMdd-HHmmss", new Date()) + ".png";
+                File ssFile = new File(ssPath, fileName);
+
+                try {
+                    FileOutputStream os = new FileOutputStream(ssFile);
+                    mBmp.compress(Bitmap.CompressFormat.PNG, 90, os);
+                    os.flush();
+                    os.close();
+
+                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + ssFile.getAbsolutePath())));
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                if (mBmp != null) {
+                    mBmp.recycle();
+                    mBmp = null;
+                }
+
+                if (mLog.isDebugEnabled()) {
+                    String log = "";
+                    log += "===================================================================\n";
+                    log += "CAPTURE END\n";
+                    log += "===================================================================\n";
+                    mLog.debug(log);
+                }
+
+                mProgress.setVisibility(View.GONE);
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, MainActivity.this);
+    }
 }
+
+// define name
+// error log
+// file name indexing
+// saved folder

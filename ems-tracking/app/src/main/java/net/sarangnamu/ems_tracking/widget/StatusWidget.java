@@ -17,12 +17,6 @@
  */
 package net.sarangnamu.ems_tracking.widget;
 
-import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.ems_tracking.EmsDataManager;
-import net.sarangnamu.ems_tracking.R;
-import net.sarangnamu.ems_tracking.api.Api;
-import net.sarangnamu.ems_tracking.api.xml.Ems;
-import net.sarangnamu.ems_tracking.db.EmsDbHelper;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -33,6 +27,14 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.RemoteViews;
+
+import net.sarangnamu.common.sqlite.DbManager;
+import net.sarangnamu.ems_tracking.EmsDataManager;
+import net.sarangnamu.ems_tracking.R;
+import net.sarangnamu.ems_tracking.api.Api;
+import net.sarangnamu.ems_tracking.api.xml.Ems;
+import net.sarangnamu.ems_tracking.cfg.Cfg;
+import net.sarangnamu.ems_tracking.db.EmsDbHelper;
 
 public class StatusWidget extends AppWidgetProvider {
     public static final String BTN_REFRESH = "btnRefresh";
@@ -96,10 +98,10 @@ public class StatusWidget extends AppWidgetProvider {
                     String num    = cr.getString(0);
                     String status = cr.getString(2);
 
-                    if (!status.equals("배달완료")) {
+                    if (!status.equals(Cfg.DONE)) {
                         Ems ems = Api.tracking(num);
                         EmsDataManager.getInstance().setEmsData(num, ems);
-                        EmsDbHelper.update(cr.getInt(1), ems);
+                        EmsDbHelper.update(cr.getInt(1), ems, null);
                     }
                 }
 
@@ -118,9 +120,9 @@ public class StatusWidget extends AppWidgetProvider {
                 while (cr.moveToNext()) {
                     String status = cr.getString(3);
 
-                    if (status.equals("미등록")) {
+                    if (status.equals(Cfg.UNREGIST)) {
                         ++unknown;
-                    } else if (status.equals("배달완료")) {
+                    } else if (status.equals(Cfg.DONE)) {
                         ++delivered;
                     }
                 }

@@ -17,16 +17,26 @@
  */
 package net.sarangnamu.ems_tracking.cfg;
 
-import net.sarangnamu.common.BkCfg;
 import android.content.Context;
+import android.support.annotation.NonNull;
+
+import net.sarangnamu.common.BkCfg;
+import net.sarangnamu.ems_tracking.db.EmsDbHelper;
 
 public class Cfg extends BkCfg {
     public static final String ADMOB_ID = "ca-app-pub-7094629622358576/3650039138";
     private static final String OPT_NAME = "OPT_NAME";
 
-    public static boolean isEmsNumber(String num) {
-        return num.matches("[a-zA-Z]{1}[0-9a-zA-Z]{12}");
+    public static final String DONE = "배달완료";
+    public static final String UNREGIST = "미등록";
+    public static final int REQ_DETAIL = 791;
 
+    public static boolean isEmsNumber(@NonNull String num) {
+        return num.matches("[a-zA-Z]{1}[0-9a-zA-Z]{12}");
+    }
+
+    public static boolean existEmsNumber(@NonNull String num) {
+        return EmsDbHelper.existNumber(num);
     }
 
     public static void setAnotherName(Context context, String emsNum, String name) {
