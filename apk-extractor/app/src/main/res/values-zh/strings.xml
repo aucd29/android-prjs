@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">APK文件提取器</string>
+    <string name="plsWait">请等待..</string>
+    <string name="appName">&lt;b&gt;APK&lt;/b&gt; 文件提取器</string>
+    <string name="downloadPath">提取路径</string>
+    <string name="dev">开发者</string>
+    <string name="extractOk">提取完成!</string>
+    <string name="sdcard">提取到SD卡</string>
+    <string name="delete">卸载</string>
+    <string name="sharing">分享</string>
+    <string name="dlgEmail">电子邮件 : </string>
+    <string name="errorEmail">没有安装电子邮件客户端。</string>
+    <string name="sendMailFail">请检查网络</string>
+    <string name="regAddr">注册地址</string>
+    <string name="save">Save</string>
+    <string name="emptyList">找不到应用</string>
+    <string name="existApp">Exist App (%s)</string>
+    
+    <!-- dlg order by  -->
+    <string name="sortDefault">Default</string>
+    <string name="alphabetAsc">字母（ASC）</string>
+    <string name="alphabetDesc">字母（降序）</string>
+    <string name="firstInstallTime">最早安装</string>
+    <string name="lastInstallTime">最后安装</string>
+    
+    <!-- MENU -->
+    <string name="mnu_email">设置电子邮件地址</string>
+    <string name="mnu_search">搜索</string>
+    <string name="mnu_search_from_mirror">从apkmirror.com搜索并下载</string>
+    <string name="mnu_showAllApps">显示所有应用程序</string>
+    <string name="mnu_showInstalledApps">显示已安装的应用程序</string>
+    <string name="mnu_setSdPath">设置SD卡路径</string>
+    <string name="mnu_specialThanks">特别感谢</string>
+    <string name="mnu_license">许可</string>
+    <string name="mnu_sortBy">排序</string>
+
+</resources>
