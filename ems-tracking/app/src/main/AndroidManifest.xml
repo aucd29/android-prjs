@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:tools="http://schemas.android.com/tools" package="net.sarangnamu.ems_tracking"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          >
+<manifest
+    package="net.sarangnamu.ems_tracking"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Include required permissions for Google Mobile Ads to run -->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -13,6 +14,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
+        android:fullBackupContent="@xml/backup_rules"
         tools:ignore="GoogleAppIndexingWarning">
 
         <!-- This meta-data tag is required to use Google Play Services. -->
@@ -25,8 +27,7 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -37,8 +38,7 @@
         <activity
             android:name=".Detail"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-        />
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!-- Include the AdActivity configChanges and theme. -->
         <activity
@@ -47,8 +47,7 @@
             android:theme="@android:style/Theme.Translucent"/>
 
         <receiver
-            android:name=".widget.StatusWidget"
-            >
+            android:name=".widget.StatusWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>

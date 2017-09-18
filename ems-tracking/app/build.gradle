@@ -17,7 +17,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "net.sarangnamu.ems_tracking"
         minSdkVersion 14
@@ -47,9 +47,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 //    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.google.android.gms:play-services-ads:9.4.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.google.android.gms:play-services-ads:11.0.4'
 
     compile 'com.github.aucd29:common:1.0.14'
     compile 'com.github.aucd29:ui:1.0.5'
