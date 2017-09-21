@@ -17,19 +17,23 @@
  */
 package net.sarangnamu.ems_tracking.db;
 
-import java.util.HashMap;
-
-import net.sarangnamu.common.sqlite.DbHelperBase;
-import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.ems_tracking.api.xml.Ems;
-import net.sarangnamu.ems_tracking.api.xml.Ems.EmsData;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
+import net.sarangnamu.common.sqlite.DbHelperBase;
+import net.sarangnamu.common.sqlite.DbManager;
+import net.sarangnamu.ems_tracking.api.xml.Ems;
+import net.sarangnamu.ems_tracking.api.xml.Ems.EmsTrackingData;
+import net.sarangnamu.ems_tracking.cfg.Cfg;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class EmsDbHelper extends DbHelperBase {
     private static final Logger mLog = LoggerFactory.getLogger(EmsDbHelper.class);
@@ -59,12 +63,65 @@ public class EmsDbHelper extends DbHelperBase {
         return DbManager.getInstance().query(Columns.TABLE, null, null, "_id DESC");
     }
 
+    public static boolean existNumber(@NonNull String number) {
+        Cursor cr = null;
+
+        try {
+            String sql = "SELECT COUNT(*) FROM " + Columns.TABLE + " WHERE " + Columns.EMS_NUM + "=?";
+            if (mLog.isDebugEnabled()) {
+                mLog.debug("sql :" + sql);
+            }
+
+            cr = DbManager.getInstance().rawQuery(sql, new String[] {number});
+            cr.moveToFirst();
+
+            return cr.getInt(0) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            mLog.error("ERROR: " + e.getMessage());
+        } finally {
+            if (cr != null) {
+                cr.close();
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean isDone(@NonNull String number) {
+        Cursor cr = null;
+
+        try {
+            String sql = String.format("SELECT %s FROM %s WHERE %s=?", Columns.STATUS, Columns.TABLE, Columns.EMS_NUM);
+            if (mLog.isDebugEnabled()) {
+                mLog.debug("sql :" + sql);
+            }
+
+            cr = DbManager.getInstance().rawQuery(sql, new String[]{number});
+            if (cr.moveToFirst()) {
+                String res = cr.getString(0);
+
+                return Cfg.DONE.equals(res);
+            }
+
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cr != null) {
+                cr.close();
+            }
+        }
+
+        return false;
+    }
+
     public static boolean insert(Ems ems) {
         try {
             ContentValues values = new ContentValues();
             values.put(Columns.EMS_NUM, ems.mEmsNum);
 
-            EmsData emsData = ems.getLastEmsData();
+            EmsTrackingData emsData = ems.getLastTrackingData();
             values.put(Columns.DATE, emsData.date);
             values.put(Columns.STATUS, emsData.status);
             values.put(Columns.OFFICE, emsData.office);
@@ -78,15 +135,19 @@ public class EmsDbHelper extends DbHelperBase {
         return false;
     }
 
-    public static boolean update(int id, Ems ems) {
+    public static boolean update(int id, Ems ems, String number) {
         try {
             ContentValues values = new ContentValues();
 
-            EmsData emsData = ems.getLastEmsData();
+            EmsTrackingData emsData = ems.getLastTrackingData();
             values.put(Columns.DATE, emsData.date);
             values.put(Columns.STATUS, emsData.status);
             values.put(Columns.OFFICE, emsData.office);
             values.put(Columns.DETAIL, emsData.detail);
+
+            if (!TextUtils.isEmpty(number)) {
+                values.put(Columns.EMS_NUM, number);
+            }
 
             int res;
             if (id == 0) {
@@ -95,7 +156,7 @@ public class EmsDbHelper extends DbHelperBase {
                 res = DbManager.getInstance().update(Columns.TABLE, values, "_id=" + id);
             }
 
-            return res > 0 ? true : false;
+            return res > 0;
         } catch (Exception e) {
             mLog.error(e.getMessage());
         }
@@ -115,11 +176,11 @@ public class EmsDbHelper extends DbHelperBase {
     }
 
     public static final class Columns implements BaseColumns {
-        public static final String EMS_NUM  = "emsNum";
-        public static final String DATE     = "date";
-        public static final String STATUS   = "status";
-        public static final String OFFICE   = "office";
-        public static final String DETAIL   = "detail";
+        public static final String EMS_NUM = "emsNum";
+        public static final String DATE    = "date";
+        public static final String STATUS  = "status";
+        public static final String OFFICE  = "office";
+        public static final String DETAIL  = "detail";
 
         public static final String TABLE = "ems";
         public static final String CREATE = "CREATE TABLE " + TABLE + "("

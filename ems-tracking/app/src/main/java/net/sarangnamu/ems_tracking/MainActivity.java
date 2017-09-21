@@ -17,22 +17,6 @@
  */
 package net.sarangnamu.ems_tracking;
 
-import net.sarangnamu.common.BkCfg;
-import net.sarangnamu.common.BkSystem;
-import net.sarangnamu.common.DimTool;
-import net.sarangnamu.common.ani.Resize;
-import net.sarangnamu.common.ani.Resize.ResizeAnimationListener;
-import net.sarangnamu.common.fonts.FontLoader;
-import net.sarangnamu.common.sqlite.DbManager;
-import net.sarangnamu.common.ui.dlg.DlgLicense;
-import net.sarangnamu.common.ui.dlg.DlgNormal;
-import net.sarangnamu.common.ui.dlg.DlgTimer;
-import net.sarangnamu.common.ui.list.AniBtnListView;
-import net.sarangnamu.ems_tracking.api.Api;
-import net.sarangnamu.ems_tracking.api.xml.Ems;
-import net.sarangnamu.ems_tracking.cfg.Cfg;
-import net.sarangnamu.ems_tracking.db.EmsDbHelper;
-import net.sarangnamu.ems_tracking.widget.StatusWidget;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -41,8 +25,10 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -57,6 +43,22 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import net.sarangnamu.common.BkCfg;
+import net.sarangnamu.common.BkSystem;
+import net.sarangnamu.common.DimTool;
+import net.sarangnamu.common.ani.Resize;
+import net.sarangnamu.common.ani.Resize.ResizeAnimationListener;
+import net.sarangnamu.common.fonts.FontLoader;
+import net.sarangnamu.common.sqlite.DbManager;
+import net.sarangnamu.common.ui.dlg.DlgLicense;
+import net.sarangnamu.common.ui.dlg.DlgTimer;
+import net.sarangnamu.common.ui.list.AniBtnListView;
+import net.sarangnamu.ems_tracking.api.Api;
+import net.sarangnamu.ems_tracking.api.xml.Ems;
+import net.sarangnamu.ems_tracking.cfg.Cfg;
+import net.sarangnamu.ems_tracking.db.EmsDbHelper;
+import net.sarangnamu.ems_tracking.widget.StatusWidget;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,27 +67,33 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends ListActivity implements View.OnClickListener {
     private static final Logger mLog = LoggerFactory.getLogger(MainActivity.class);
-
     private static final int SLIDING_MARGIN = 186;
+
+    @BindView(R.id.add)
+    Button mAddBtn;
+
+    @BindView(R.id.title)
+    TextView mTitle;
+
+    @BindView(android.R.id.empty)
+    TextView mEmpty;
+
+    @BindView(R.id.emsNum)
+    EditText mEmsNum;
+
+    @BindView(R.id.anotherName)
+    EditText mAnotherName;
+
+    @BindView(R.id.refersh)
+    ImageButton mRefreshBtn;
+
+    @BindView(R.id.editLayout)
+    RelativeLayout mEditLayout;
 
     private int mModifyId = -1;
     private boolean mExpandLayoutId = false;
 
-    @BindView(R.id.add)
-    Button mAddBtn;
-    @BindView(R.id.title)
-    TextView mTitle;
-    @BindView(android.R.id.empty)
-    TextView mEmpty;
-    @BindView(R.id.emsNum)
-    EditText mEmsNum;
-    @BindView(R.id.anotherName)
-    EditText mAnotherName;
-    @BindView(R.id.refersh)
-    ImageButton mRefreshBtn;
-    @BindView(R.id.editLayout)
-    RelativeLayout mEditLayout;
-
+    private String oldEmsNumber;
     private EmsAdapter mAdapter;
     private ProgressDialog mDlg;
 
@@ -108,9 +116,9 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         }
 
         mAddBtn.setOnClickListener(v -> {
-            final String num = mEmsNum.getText().toString();
+            final String num = mEmsNum.getText().toString().toUpperCase();
 
-            if (num.length() < 1) {
+            if (TextUtils.isEmpty(num)) {
                 showPopup(getString(R.string.plsInputNum));
                 return;
             }
@@ -120,8 +128,18 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 return;
             }
 
+            // old number 가 null 이면 new 임
+            // old number 와 num 이 다르면 modify 임
+            // 마지막으로 db 에 ems number 가 존재하면 오류를 출력 함
+            if ((oldEmsNumber == null || !num.equals(oldEmsNumber)) && Cfg.existEmsNumber(num)) {
+                showPopup(getString(R.string.exist_number));
+                return ;
+            }
+
             trackingAndInsertDB(num);
             Cfg.setAnotherName(getApplicationContext(), num.toUpperCase(), mAnotherName.getText().toString());
+
+            oldEmsNumber = null;
         });
 
         mRefreshBtn.setOnClickListener(v -> {
@@ -149,6 +167,60 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         BkCfg.engKeyboard(mEmsNum);
     }
 
+    private void initData() {
+        DbManager.getInstance().open(this, new EmsDbHelper(this));
+        loadEmsData();
+    }
+
+    private void loadEmsData() {
+        new AsyncTask<Context, Void, Boolean>() {
+            @Override
+            protected void onPreExecute() {
+                showProgress();
+            }
+
+            @Override
+            protected Boolean doInBackground(Context... contexts) {
+                try {
+                    Cursor cr = EmsDbHelper.select();
+
+                    while (cr.moveToNext()) {
+                        String num    = cr.getString(0);
+                        String status = cr.getString(2);
+
+                        // 배달완료된 항목은 로딩시 체크하지 않는다.
+                        if (!status.equals(Cfg.DONE)) {
+                            Ems ems = Api.tracking(num);
+
+                            EmsDataManager.getInstance().setEmsData(num, ems);
+                            EmsDbHelper.update(cr.getInt(1), ems, null);
+                        }
+                    }
+                } catch (Exception e) {
+                    mLog.error(e.getMessage());
+
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                mRefreshBtn.setEnabled(true);
+
+                hideProgress();
+                initListView();
+            }
+        }.execute(getApplicationContext());
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // 수정 모드 
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+    
     private void showAnotherName() {
         if (mExpandLayoutId) {
             return ;
@@ -168,9 +240,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             }
 
             @Override
-            public void onAnimationStart() {
-
-            }
+            public void onAnimationStart() { }
         });
     }
 
@@ -189,6 +259,20 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         });
     }
 
+    private void resetUi() {
+        hideAnotherName();
+
+        mModifyId = -1;
+        mAddBtn.setText(R.string.add);
+        mEmsNum.setText("");
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // XML 데이터 파싱
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+
     private void trackingAndInsertDB(final String num) {
         new AsyncTask<Context, Void, Boolean>() {
             String errMsg;
@@ -206,7 +290,11 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 if (mModifyId == -1) {
                     return EmsDbHelper.insert(ems);
                 } else {
-                    return EmsDbHelper.update(mModifyId, ems);
+                    if (num.equals(oldEmsNumber)) {
+                        return EmsDbHelper.update(mModifyId, ems, null);
+                    }
+
+                    return EmsDbHelper.update(mModifyId, ems, num);
                 }
             }
 
@@ -275,61 +363,19 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     @Override
     public void onBackPressed() {
         if (mAnotherName != null && mAnotherName.getVisibility() == View.VISIBLE) {
-            hideAnotherName();
-
-            mModifyId = -1;
-            mAddBtn.setText(R.string.add);
-            mEmsNum.setText("");
+            resetUi();
         } else {
             super.onBackPressed();
         }
     }
 
-    private void initData() {
-        DbManager.getInstance().open(this, new EmsDbHelper(this));
-        loadEmsData();
-    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-    private void loadEmsData() {
-        new AsyncTask<Context, Void, Boolean>() {
-            @Override
-            protected void onPreExecute() {
-                showProgress();
-            }
-
-            @Override
-            protected Boolean doInBackground(Context... contexts) {
-                try {
-                    Cursor cr = EmsDbHelper.select();
-
-                    while (cr.moveToNext()) {
-                        String num    = cr.getString(0);
-                        String status = cr.getString(2);
-
-                        // 배달완료된 항목은 로딩시 체크하지 않는다.
-                        if (!status.equals("배달완료")) {
-                            Ems ems = Api.tracking(num);
-                            EmsDataManager.getInstance().setEmsData(num, ems);
-                            EmsDbHelper.update(cr.getInt(1), ems);
-                        }
-                    }
-                } catch (Exception e) {
-                    mLog.error(e.getMessage());
-
-                    return false;
-                }
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                mRefreshBtn.setEnabled(true);
-
-                hideProgress();
-                initListView();
-            }
-        }.execute(getApplicationContext());
+        if (requestCode == Cfg.REQ_DETAIL) {
+            loadEmsData();
+        }
     }
 
     public void showProgress() {
@@ -369,7 +415,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
         dlg.setTransparentBaseLayout();
     }
 
-    private void showDetail(final String emsNum) {
+    private void showDetail(final int id, final String emsNum) {
         EmsDataManager.getInstance().getAsyncEmsData(this, emsNum, ems -> {
             if (ems == null) {
                 mLog.error("ems == null");
@@ -378,7 +424,10 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
             Intent intent = new Intent(MainActivity.this, Detail.class);
             intent.putExtra(EmsDataManager.EMS_NUM, ems.mEmsNum);
-            startActivity(intent);
+            intent.putExtra(EmsDataManager.EMS_PRIMARY_KEY, id);
+
+            startActivityForResult(intent, Cfg.REQ_DETAIL);
+            resetUi();
         });
     }
 
@@ -417,8 +466,10 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
     class DetailType {
         final String emsNum;
         final View row;
+        final int id;
 
-        DetailType(String emsNum, View row) {
+        DetailType(int id, String emsNum, View row) {
+            this.id = id;
             this.emsNum = emsNum;
             this.row = row;
         }
@@ -483,7 +534,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
 
             vh.date.setText(cr.getString(pos++));
             vh.status.setText(cr.getString(pos++));
-            vh.detail.setTag(new DetailType(emsNumber, vh.row));
+            vh.detail.setTag(new DetailType(id, emsNumber, vh.row));
             vh.detail.setOnClickListener(MainActivity.this);
             vh.row.setOnClickListener(MainActivity.this);
 
@@ -516,24 +567,25 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
             final Object obj = v.getTag();
 
             if (obj instanceof DeleteType) {
-                DlgNormal dlg = new DlgNormal(this);
-                dlg.setCancelable(false);
-                dlg.setMessage(R.string.deleteMsg);
-                dlg.setOnBtnListener(() -> {
-                    DeleteType typeObj = (DeleteType) obj;
-                    int id = typeObj.id;
-                    if (id != 0) {
-                        deleteItem(id);
-                    }
+                new AlertDialog.Builder(this)
+                        .setCancelable(false)
+                        .setMessage(R.string.deleteMsg)
+                        .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                            DeleteType typeObj = (DeleteType) obj;
+                            int id = typeObj.id;
+                            if (id != 0) {
+                                deleteItem(id);
+                            }
 
-                    Cfg.setAnotherName(MainActivity.this, typeObj.emsNum, "");
-                });
-                dlg.show();
-                dlg.hideTitle();
-                dlg.setDialogSize(dpToPixelInt(330), -1);
+                            Cfg.setAnotherName(MainActivity.this, typeObj.emsNum, "");
+
+                            dialogInterface.dismiss();
+                        })
+                        .setNegativeButton(android.R.string.cancel, (dialogInterface, i) -> dialogInterface.dismiss())
+                        .show();
             } else if (obj instanceof DetailType) {
                 final DetailType type = (DetailType) obj;
-                showDetail(type.emsNum);
+                showDetail(type.id, type.emsNum);
             } else if (obj instanceof ModifyType) {
                 ModifyType typeObj = (ModifyType) obj;
 
@@ -541,6 +593,7 @@ public class MainActivity extends ListActivity implements View.OnClickListener {
                 mAnotherName.setText(Cfg.getAnotherName(MainActivity.this, typeObj.emsNum));
                 mAddBtn.setText(R.string.modify);
 
+                oldEmsNumber = typeObj.emsNum;
                 mModifyId = typeObj.id;
             }
         }

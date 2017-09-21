@@ -14,7 +14,7 @@
     <string name="detailedInfo">Detail information</string>
     <string name="deleted">Deleted</string>
     <string name="detail">Detail</string>
-    <string name="deleteMsg">Sure that you want to delete?</string>
+    <string name="deleteMsg">Are you sure you want to delete?</string>
     <string name="insertErrorMsg">Input Error</string>
     <string name="anotherName">Another Name (Optional)</string>
     <string name="done">Done</string>
@@ -22,6 +22,7 @@
     <string name="hideDlgForAnotherName">Hide Dialog for a Another Name</string>
     <string name="modify">Modify</string>
     <string name="license">License</string>
-    <string name="shipped_to_apply">Shipped to apply</string>
+    <string name="shipped_to_apply">Apply Delivery Completion</string>
+    <string name="exist_number">This number already exists.</string>
 
 </resources>

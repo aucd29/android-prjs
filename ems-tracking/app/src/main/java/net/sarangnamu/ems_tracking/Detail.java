@@ -17,13 +17,9 @@
  */
 package net.sarangnamu.ems_tracking;
 
-import net.sarangnamu.common.ui.StatusBar;
-import net.sarangnamu.ems_tracking.ad.AdmobDecorator;
-import net.sarangnamu.ems_tracking.api.xml.Ems;
-import net.sarangnamu.ems_tracking.api.xml.Ems.EmsData;
-import net.sarangnamu.ems_tracking.cfg.Cfg;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,41 +27,54 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import net.sarangnamu.ems_tracking.ad.AdmobDecorator;
+import net.sarangnamu.ems_tracking.api.xml.Ems;
+import net.sarangnamu.ems_tracking.api.xml.Ems.EmsTrackingData;
+import net.sarangnamu.ems_tracking.cfg.Cfg;
+import net.sarangnamu.ems_tracking.db.EmsDbHelper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class Detail extends Activity {
-    private Ems mEms;
+public class Detail extends AppCompatActivity {
+    private static final Logger mLog = LoggerFactory.getLogger(Detail.class);
 
     @BindView(R.id.emsNum)
     TextView mEmsNum;
+
     @BindView(R.id.detail)
     TextView mDetail;
+
     @BindView(R.id.shipped_to_apply)
     TextView mShippedToApply;
+
     @BindView(R.id.list)
     ListView mList;
 
+    private Ems mEms;
+    private int mEmsPrimaryKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         String emsNumber = getIntent().getStringExtra(EmsDataManager.EMS_NUM);
+        mEmsPrimaryKey   = getIntent().getIntExtra(EmsDataManager.EMS_PRIMARY_KEY, -1);
+
         mEms = EmsDataManager.getInstance().getEmsData(emsNumber);
         if (mEms == null) {
             finish();
         }
 
         setContentView(R.layout.detail);
-
         ButterKnife.bind(this);
 
         initLabel();
         initAdView();
         initListView();
-
-        StatusBar.setColor(getWindow(), 0xffe73636);
     }
 
     @Override
@@ -89,7 +98,25 @@ public class Detail extends Activity {
         }
 
         mShippedToApply.setOnClickListener(v -> {
+            new AlertDialog.Builder(Detail.this)
+                    .setMessage(R.string.shipped_to_apply)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        if (mEmsPrimaryKey == -1) {
+                            return ;
+                        }
 
+                        EmsTrackingData lastData = mEms.getLastTrackingData();
+                        if (lastData == null) {
+                            return ;
+                        }
+
+                        lastData.status = Cfg.DONE;
+                        EmsDataManager.getInstance().setEmsData(mEms.mEmsNum, mEms);
+                        EmsDbHelper.update(mEmsPrimaryKey, mEms, null);
+
+                        ((BaseAdapter) mList.getAdapter()).notifyDataSetChanged();
+                    }).setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                    .show();
         });
     }
 
@@ -121,7 +148,7 @@ public class Detail extends Activity {
                 return 0;
             }
 
-            return mEms.mEmsData.size();
+            return mEms.mTrackingList.size();
         }
 
         @Override
@@ -151,7 +178,7 @@ public class Detail extends Activity {
                 vh = (ViewHolder) view.getTag();
             }
 
-            EmsData data = mEms.getEmsData(pos);
+            EmsTrackingData data = mEms.getEmsDataFromXml(pos);
 
             vh.office.setText(data.office);
             vh.status.setText(data.status);

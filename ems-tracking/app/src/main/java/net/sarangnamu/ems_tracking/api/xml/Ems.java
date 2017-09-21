@@ -17,22 +17,25 @@
  */
 package net.sarangnamu.ems_tracking.api.xml;
 
-import java.util.ArrayList;
-
-import javax.xml.xpath.XPathConstants;
-
 import net.sarangnamu.common.XPathParser;
+import net.sarangnamu.ems_tracking.cfg.Cfg;
+import net.sarangnamu.ems_tracking.db.EmsDbHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+
+import javax.xml.xpath.XPathConstants;
 
 public class Ems extends XPathParser {
     private static final Logger mLog = LoggerFactory.getLogger(Ems.class);
 
     public String mEmsNum;
-    public final String mTmpNum;
-    public ArrayList<EmsData> mEmsData = new ArrayList<>();
     public String mErrMsg;
+
+    public final String mTmpNum;
+    public ArrayList<EmsTrackingData> mTrackingList = new ArrayList<>();
 
     public Ems(String ems, String emsNum) {
         super();
@@ -43,8 +46,8 @@ public class Ems extends XPathParser {
 
     @Override
     protected void parsing() throws Exception {
-        if (mEmsData == null) {
-            mEmsData = new ArrayList<>();
+        if (mTrackingList == null) {
+            mTrackingList = new ArrayList<>();
         }
 
         /*
@@ -139,41 +142,41 @@ public class Ems extends XPathParser {
             mErrMsg += "]";
 
             mEmsNum = mTmpNum;
-            mEmsData.add(new EmsData());
+            mTrackingList.add(new EmsTrackingData());
         } else {
             for (int i=2; i<=count; ++i) {
-                mEmsData.add(new EmsData(i));
+                mTrackingList.add(new EmsTrackingData(i));
             }
         }
     }
 
     public int getDataCount() {
-        if (mEmsData == null) {
+        if (mTrackingList == null) {
             return 0;
         }
 
-        return mEmsData.size();
+        return mTrackingList.size();
     }
 
-    public EmsData getEmsData(int pos) {
-        if (mEmsData == null) {
+    public EmsTrackingData getEmsDataFromXml(int pos) {
+        if (mTrackingList == null) {
             return null;
         }
 
-        return mEmsData.get(pos);
+        return mTrackingList.get(pos);
     }
 
-    public EmsData getLastEmsData() {
-        if (mEmsData == null) {
+    public EmsTrackingData getLastTrackingData() {
+        if (mTrackingList == null) {
             return null;
         }
 
-        int pos = mEmsData.size();
+        int pos = mTrackingList.size();
         if (pos == 0) {
             return null;
         }
 
-        return mEmsData.get(pos - 1);
+        return mTrackingList.get(pos - 1);
     }
 
     public void trace() {
@@ -182,27 +185,32 @@ public class Ems extends XPathParser {
                 "===================================================================\n" +
                 "ems number : " + mEmsNum;
 
-        for (EmsData data : mEmsData) {
+        for (EmsTrackingData data : mTrackingList) {
             data.trace();
         }
 
         mLog.debug(log);
     }
 
-    public class EmsData {
+    public class EmsTrackingData {
         public String date;
         public String status;
         public String office;
         public String detail;
 
-        public EmsData() {
+        public EmsTrackingData() {
+            if (EmsDbHelper.isDone(mEmsNum)) {
+                status = Cfg.DONE;
+            } else {
+                status = Cfg.UNREGIST; //"미등록";
+            }
+
             date   = "";
-            status = "미등록";
             office = "-";
             detail = "-";
         }
 
-        public EmsData(int pos) throws Exception {
+        public EmsTrackingData(int pos) throws Exception {
             String expr, prefix = "//xsyncData[" + pos + "]";
 
             expr = prefix + "/processDe/text()";
