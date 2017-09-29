@@ -17,11 +17,90 @@ class MainActivity : AppCompatActivity() {
 //        q1()
     }
 
-    fun q3() {
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // https://ko.wikipedia.org/wiki/LRU
+    // LRU(Least Recently Used)는 교체 전략 중의 하나로 사용한지 가장 오래된 항목부터 버리는 방식이다.
+    // - cache (0 ~ 30)
+    // - city name
+    //   최대 100,000, eng only, maxlength 20,
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
 
+    fun q3() {
+        Q3().apply { cities = arrayListOf("Jeju", "Pangyo", "Seoul", "NewYork", "LA", "Jeju", "Pangyo", "Seoul", "NewYork", "LA") }.process()
+        Q3().apply { cities = arrayListOf("Jeju", "Pangyo", "Seoul", "Jeju", "Pangyo", "Seoul", "Jeju", "Pangyo", "Seoul") }.process()
+        Q3().apply {
+            cacheSize(2)
+            cities = arrayListOf("Jeju", "Pangyo", "Seoul", "NewYork", "LA", "SanFrancisco", "Seoul", "Rome", "Paris", "Jeju", "NewYork", "Rome")
+        }.process()
+
+        Q3().apply {
+            cacheSize(5)
+            cities = arrayListOf("Jeju", "Pangyo", "Seoul", "NewYork", "LA", "SanFrancisco", "Seoul", "Rome", "Paris", "Jeju", "NewYork", "Rome")
+        }.process()
+
+        Q3().apply {
+            cacheSize(2)
+            cities = arrayListOf("Jeju", "Pangyo", "NewYork", "newyork")
+        }.process()
+
+        Q3().apply {
+            cacheSize(0)
+            cities = arrayListOf("Jeju", "Pangyo", "Seoul", "NewYork", "LA")
+        }.process()
     }
 
+    class Q3 {
+        private var cacheSize = 3
+        var cities: ArrayList<String> = ArrayList()
+        var runningTime = 0
 
+        fun cacheSize(cacheSize: Int) {
+            if (cacheSize < 0) {
+                this.cacheSize = 0
+            } else if (cacheSize > 30) {
+                this.cacheSize = 30
+            } else {
+                this.cacheSize = cacheSize
+            }
+        }
+
+        fun process() {
+            replaceCities()
+            val cache = ArrayList<String>()
+
+            cities.forEach {
+                if (!cache.contains(it)) {
+                    runningTime += 5
+
+                    if (cacheSize > 0) {
+                        if (cache.size > cacheSize - 1) {
+                            cache.removeAt(0)
+                        }
+
+                        cache.add(it)
+                    }
+                } else {
+                    ++runningTime
+                }
+            }
+
+            trace()
+        }
+
+        fun replaceCities() {
+            val it = cities.listIterator()
+            while (it.hasNext()) {
+                val city = it.next().toLowerCase()
+                it.set(city)
+            }
+        }
+
+        fun trace() {
+            Log.e("q3", "RUNNING TIME: $runningTime")
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////
     //
