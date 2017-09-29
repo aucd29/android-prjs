@@ -12,9 +12,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        q2()
+        q3()
+//        q2()
 //        q1()
     }
+
+    fun q3() {
+
+    }
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////
     //
@@ -82,24 +89,24 @@ class MainActivity : AppCompatActivity() {
         var totalResult: Int = 0
 
         fun process() {
-            val listData = ArrayList<Q2Result>()
+            val parseList = ArrayList<Q2Result>()
             (0..2).forEach {
-                val result = cal()
-                if (listData.size > 0) {
-                    listData.last().nextRes = result
+                val result = parse()
+                if (parseList.size > 0) {
+                    parseList.last().nextRes = result
                 }
 
-                listData.add(result)
+                parseList.add(result)
             }
 
-            listData.forEach {
+            parseList.forEach {
                 totalResult += it.cal()
             }
 
             trace()
         }
 
-        fun cal(): Q2Result {
+        fun parse(): Q2Result {
             var value: Int
             val start = index
             val result = Q2Result()
