@@ -1,54 +1,9 @@
 <configuration>
-
-    <!-- Create a file appender for a log in the application's data directory -->
-    <!--
-  <appender name="file" class="ch.qos.logback.core.FileAppender">
-    <file>/data/data/com.example/files/log/foo.log</file>
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>  
-  </appender>
-    -->
-
     <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
-        <tagEncoder>
-            <pattern>%class{0}[%thread]</pattern>
-        </tagEncoder>
-
-        <encoder>
-            <pattern>%msg - %M:%L%n</pattern>
-        </encoder>
+        <tagEncoder><pattern>[BK]%class{0}:%L %M</pattern></tagEncoder>
+        <encoder><pattern>%msg%n</pattern></encoder>
     </appender>
-    <!--
-  <appender name="logcat" class="ni.mh.android.launcher.common.CustomLogAppender">
-    <tagEncoder>
-    	<pattern>jjanggyo.%logger{5}</pattern>
-    </tagEncoder>
-    <encoder>
-      <pattern>[%thread]%class{0}.%M:%L - %msg%n</pattern>
-    </encoder>
-  </appender>
-    -->
-    <!--
-  <appender name="server" class="honemobile.client.logger.ServerLogAppender">
-    <encoder>
-      <pattern>%msg</pattern>
-    </encoder>
-  </appender>
-    -->
-    <!-- Write INFO (and higher-level) messages to the log file -->
-
-    <root level="error" >
-        <!--
-       <root level="ERROR|TRACE">
-		trace
-		debug
-		info
-		warn
-		error
-        -->
-        <appender-ref ref="logcat" />
-<!--     <appender-ref ref="server" /> -->
+    <root level="error">
+        <appender-ref ref="logcat"/>
     </root>
-
 </configuration>

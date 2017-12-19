@@ -19,7 +19,9 @@ package com.ipaulpro.afilechooser;
 import java.io.File;
 
 import net.sarangnamu.common.explorer.R;
+
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,25 +35,24 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 /**
  * Main Activity that handles the FileListFragments
- * 
- * @version 2013-06-25
- * 
+ *
  * @author paulburke (ipaulpro)
- * 
+ * @version 2013-06-25
  */
-public class FileChooserActivity extends FragmentActivity implements OnBackStackChangedListener {
+public class FileChooserActivity extends AppCompatActivity implements OnBackStackChangedListener {
     public static final String PATH = "path";
     public static final String EXTERNAL_BASE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath();
 
     private static final boolean HAS_ACTIONBAR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
 
-    protected FragmentManager mFragmentManager;
+    private FragmentManager mFragmentManager;
     private BroadcastReceiver mStorageListener = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -138,9 +139,9 @@ public class FileChooserActivity extends FragmentActivity implements OnBackStack
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-            mFragmentManager.popBackStack();
-            return true;
+            case android.R.id.home:
+                mFragmentManager.popBackStack();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -157,7 +158,7 @@ public class FileChooserActivity extends FragmentActivity implements OnBackStack
     /**
      * "Replace" the existing Fragment with a new one using given path.
      * We're really adding a Fragment to the back stack.
-     * 
+     *
      * @param file The file (directory) to display.
      */
     protected void replaceFragment(File file) {
@@ -165,9 +166,9 @@ public class FileChooserActivity extends FragmentActivity implements OnBackStack
 
         FileListFragment fragment = instListFragment();
         mFragmentManager.beginTransaction()
-        .replace(R.id.explorer_fragment, fragment)
-        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-        .addToBackStack(mPath).commit();
+                .replace(R.id.explorer_fragment, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(mPath).commit();
     }
 
     protected FileListFragment instListFragment() {
@@ -176,7 +177,7 @@ public class FileChooserActivity extends FragmentActivity implements OnBackStack
 
     /**
      * Finish this Activity with a result code and URI of the selected file.
-     * 
+     *
      * @param file The file selected.
      */
     private void finishWithResult(File file) {
@@ -192,7 +193,7 @@ public class FileChooserActivity extends FragmentActivity implements OnBackStack
 
     /**
      * Called when the user selects a File
-     * 
+     *
      * @param file The file that was selected
      */
     protected void onFileSelected(File file) {

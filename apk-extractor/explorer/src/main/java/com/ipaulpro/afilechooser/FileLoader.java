@@ -34,7 +34,6 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
  * 
  */
 public class FileLoader extends AsyncTaskLoader<List<File>> {
-
     private static final int FILE_OBSERVER_MASK = FileObserver.CREATE
             | FileObserver.DELETE | FileObserver.DELETE_SELF
             | FileObserver.MOVED_FROM | FileObserver.MOVED_TO

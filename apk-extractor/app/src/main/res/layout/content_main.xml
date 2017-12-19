@@ -9,24 +9,23 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="net.sarangnamu.apk_extractor.MainActivity"
-    tools:showIn="@layout/activity_main"
-    >
+    tools:showIn="@layout/activity_main">
 
     <RelativeLayout
-        android:id="@+id/titleBar"
+        android:id="@+id/main_title_bar"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/dBg">
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
-            android:id="@+id/title"
+        <net.sarangnamu.common.RobotoLightTextView
+            android:id="@+id/main_title"
             style="@style/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
-            android:id="@+id/tvSearch"
+        <net.sarangnamu.common.RobotoLightTextView
+            android:id="@+id/main_tv_search"
             style="@style/search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,13 +36,13 @@
             android:visibility="gone"/>
 
         <EditText
-            android:id="@+id/search"
+            android:id="@+id/main_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="17dp"
             android:layout_marginRight="60dp"
-            android:layout_toRightOf="@id/tvSearch"
+            android:layout_toRightOf="@id/main_tv_search"
             android:background="#ffffff"
             android:ems="10"
             android:hint=""
@@ -51,7 +50,7 @@
             android:visibility="gone"/>
 
         <ImageButton
-            android:id="@+id/menu"
+            android:id="@+id/main_menu"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
@@ -66,7 +65,7 @@
         android:background="#d9d9d9">
 
         <ProgressBar
-            android:id="@+id/sdProgressBar"
+            android:id="@+id/main_progress"
             style="@style/tallerBarStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -74,8 +73,8 @@
             android:minHeight="20dp"
             android:visibility="gone"/>
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
-            android:id="@+id/dev"
+        <net.sarangnamu.common.RobotoLightTextView
+            android:id="@+id/main_dev"
             style="@style/path"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -83,8 +82,8 @@
             android:gravity="center_vertical"
             android:text="@string/dev"/>
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
-            android:id="@+id/path"
+        <net.sarangnamu.common.RobotoLightTextView
+            android:id="@+id/main_path"
             style="@style/path"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -104,7 +103,7 @@
         android:drawSelectorOnTop="false"
         />
 
-    <net.sarangnamu.common.fonts.RobotoLightTextView
+    <net.sarangnamu.common.RobotoLightTextView
         android:id="@android:id/empty"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

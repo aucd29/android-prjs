@@ -32,20 +32,28 @@
             <RadioButton
                 android:id="@+id/alphabetAsc"
                 android:layout_marginBottom="10dp"
-                android:text="@string/alphabetAsc" />
+                android:text="@string/alphabetAsc"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
 
             <RadioButton
                 android:id="@+id/alphabetDesc"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:text="@string/alphabetDesc" />
 
             <RadioButton
                 android:id="@+id/firstInstallTime"
                 android:layout_marginBottom="10dp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="@string/firstInstallTime" />
 
             <RadioButton
                 android:id="@+id/lastInstallTime"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:text="@string/lastInstallTime" />
         </RadioGroup>
         

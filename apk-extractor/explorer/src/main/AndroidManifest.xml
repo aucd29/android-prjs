@@ -2,14 +2,12 @@
     package="net.sarangnamu.common.explorer"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application
-        >
-
+    <application>
         <activity
-            android:name=".DirChooserActivity"
+            android:name="net.sarangnamu.common.explorer.DirChooserActivity"
             android:exported="false"
             android:label="@string/choose_file"
-            android:theme="@android:style/Theme.Holo.Light">
+            android:theme="@style/Explorer.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT"/>
 
@@ -19,7 +17,5 @@
                 <data android:mimeType="*/*"/>
             </intent-filter>
         </activity>
-
     </application>
-
 </manifest>

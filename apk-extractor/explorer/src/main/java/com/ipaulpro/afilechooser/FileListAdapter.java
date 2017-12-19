@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sarangnamu.common.explorer.R;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +32,9 @@ import android.widget.TextView;
 
 /**
  * List adapter for Files.
- * 
- * @version 2013-06-25
- * 
+ *
  * @author paulburke (ipaulpro)
- * 
+ * @version 2013-06-25
  */
 public class FileListAdapter extends BaseAdapter {
     protected static int ICON_FOLDER = R.drawable.ic_folder;

@@ -28,20 +28,29 @@ class MainActivity : AppCompatActivity() {
     // 도착 시각은 00:01 에서 23:59 사이
     //
     // 사무실에 갈 수 있는 제일 늦은 도착 시작 출력
+    /*
+    n	t	m	timetable	                                    answer
+    1	1	5	["08:00", "08:01", "08:02", "08:03"]	        "09:00"
+    2	10	2	["09:10", "09:09", "08:00"]             	    "09:09"
+    2	1	2	["09:00", "09:00", "09:00", "09:00"]	        "08:59"
+    1	1	5	["00:01", "00:01", "00:01", "00:01", "00:01"]	"00:00"
+    1	1	1	["23:59"]	                                    "09:00"
+    10	60	45	["23:59","23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59", "23:59"]	"18:00"
+     */
     //
     ////////////////////////////////////////////////////////////////////////////////////
 
     fun q4() {
-//        Q4().process()
-        Q4().apply {
-            n = 2
-            t = 10
-            m = 2
-            timetable = arrayListOf("09:10", "09:09", "08:00")
-        }.process()
+        Q4().process()
+//        Q4().apply {
+//            n = 2
+//            t = 10
+//            m = 2
+//            timetable = arrayListOf("09:10", "09:09", "08:00")
+//        }.process()
     }
 
-    data class Q4Time (
+    data class Q4CrewTime(
         val date: String,
         val timestamp: Long
     )
@@ -59,14 +68,14 @@ class MainActivity : AppCompatActivity() {
         var m = 5   // 탑승 인원
         var timetable = arrayListOf("08:00", "08:01", "08:02", "08:03")
 
-        fun parseCrewTime(): ArrayList<ArrayList<Q4Time>> {
-            val crewTimeList = ArrayList<ArrayList<Q4Time>>()
+        fun parseCrewTime(): ArrayList<ArrayList<Q4CrewTime>> {
+            val crewTimeList = ArrayList<ArrayList<Q4CrewTime>>()
 
             timetable.sort()
             val it = timetable.listIterator()
             while (it.hasNext()) {
                 var i = 0
-                val list = ArrayList<Q4Time>()
+                val list = ArrayList<Q4CrewTime>()
 
                 while (i++ < m) {
                     if (!it.hasNext()) {
@@ -77,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                     val converted = convertCrewTime(time)
 
                     Log.i("q4", "CREW [$time] = $converted")
-                    list.add(Q4Time(time, converted))
+                    list.add(Q4CrewTime(time, converted))
                 }
 
                 crewTimeList.add(list)
@@ -96,33 +105,41 @@ class MainActivity : AppCompatActivity() {
 
         fun process() {
             var busStartTime = Date(YEAR, MONTH, DAY, HOUR, MIN, SEC).time
+            var nextBusTime  = busStartTime + (60 * t)
+
             Log.i("q4", "BUS START = $busStartTime")
 
             val crewTimeList = parseCrewTime()
             // arrayListOf("09:10", "09:09", "08:00")
             var i = 0
             var lastTime:Long = 0
-            while (i < n) {
-                var it = crewTimeList.get(i).listIterator()
-                while (it.hasNext()) {
-                    val q4time = it.next()
-                    if (busStartTime <= q4time.timestamp) {
-                        Log.i("q4", "TAKE ${q4time.date}")
-                        lastTime = q4time.timestamp - 60
-                        break;
-                    }
+            var crewIt = crewTimeList.get(i).listIterator()
+            var j = 0
+            var crew: Q4CrewTime
+
+            while (j++ < m) {
+                crew = crewIt.next()
+
+                if (crew.timestamp >= nextBusTime) {
+                    break;
                 }
+
+
+            }
+
+
+            while (i < n) {
+
+
+
 
                 if (n > 1) {
                     // next bus time
-                    busStartTime += 60 * t
+                    busStartTime = nextBusTime
+                    nextBusTime  = busStartTime + (60 * t)
                 }
 
                 ++i
-            }
-
-            if (lastTime > busStartTime) {
-                lastTime = busStartTime
             }
 
             trace(busStartTime)

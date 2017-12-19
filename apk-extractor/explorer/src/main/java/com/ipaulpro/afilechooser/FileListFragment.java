@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.List;
 
 import net.sarangnamu.common.explorer.R;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ListFragment;
@@ -30,11 +31,9 @@ import android.widget.ListView;
 
 /**
  * Fragment that displays a list of Files in a given path.
- * 
- * @version 2012-10-28
- * 
+ *
  * @author paulburke (ipaulpro)
- * 
+ * @version 2012-10-28
  */
 public class FileListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<List<File>> {
 
@@ -42,11 +41,10 @@ public class FileListFragment extends ListFragment implements LoaderManager.Load
 
     protected FileListAdapter mAdapter;
     protected String mPath;
-    protected String mDefaultPath;
 
     /**
      * Create a new instance with the given file path.
-     * 
+     *
      * @param path The absolute path of the file (directory) to display.
      * @return A new Fragment with the given file path.
      */
@@ -64,7 +62,7 @@ public class FileListFragment extends ListFragment implements LoaderManager.Load
         super.onCreate(savedInstanceState);
 
         mAdapter = instAdapter();
-        mDefaultPath = mPath = getArguments() != null ? getArguments().getString(FileChooserActivity.PATH)
+        mPath = getArguments() != null ? getArguments().getString(FileChooserActivity.PATH)
                 : Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 

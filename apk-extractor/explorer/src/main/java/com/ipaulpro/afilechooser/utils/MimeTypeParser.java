@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 OpenIntents.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,68 +28,68 @@ import android.content.res.XmlResourceParser;
 
 public class MimeTypeParser {
 
-	public static final String TAG_MIMETYPES = "MimeTypes";
-	public static final String TAG_TYPE = "type";
-	
-	public static final String ATTR_EXTENSION = "extension";
-	public static final String ATTR_MIMETYPE = "mimetype";
-	
-	private XmlPullParser mXpp;
-	private MimeTypes mMimeTypes;
-    
-	public MimeTypeParser() {
-	}
-	
-	public MimeTypes fromXml(InputStream in)
-			throws XmlPullParserException, IOException {
-		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+    public static final String TAG_MIMETYPES = "MimeTypes";
+    public static final String TAG_TYPE = "type";
 
-		mXpp = factory.newPullParser();
-		mXpp.setInput(new InputStreamReader(in));
+    public static final String ATTR_EXTENSION = "extension";
+    public static final String ATTR_MIMETYPE = "mimetype";
 
-		return parse();
-	}
-	
-	public MimeTypes fromXmlResource(XmlResourceParser in)
-	throws XmlPullParserException, IOException {
-		mXpp = in;
-		
-		return parse();
-	}
+    private XmlPullParser mXpp;
+    private MimeTypes mMimeTypes;
 
-	public MimeTypes parse()
-			throws XmlPullParserException, IOException {
-		
-		mMimeTypes = new MimeTypes();
-		
-		int eventType = mXpp.getEventType();
+    public MimeTypeParser() {
+    }
 
-		while (eventType != XmlPullParser.END_DOCUMENT) {
-			String tag = mXpp.getName();
+    public MimeTypes fromXml(InputStream in)
+            throws XmlPullParserException, IOException {
+        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
 
-			if (eventType == XmlPullParser.START_TAG) {
-				if (tag.equals(TAG_MIMETYPES)) {
-					
-				} else if (tag.equals(TAG_TYPE)) {
-					addMimeTypeStart();
-				}
-			} else if (eventType == XmlPullParser.END_TAG) {
-				if (tag.equals(TAG_MIMETYPES)) {
-					
-				}
-			}
+        mXpp = factory.newPullParser();
+        mXpp.setInput(new InputStreamReader(in));
 
-			eventType = mXpp.next();
-		}
+        return parse();
+    }
 
-		return mMimeTypes;
-	}
-	
-	private void addMimeTypeStart() {
-		String extension = mXpp.getAttributeValue(null, ATTR_EXTENSION);
-		String mimetype = mXpp.getAttributeValue(null, ATTR_MIMETYPE);
-		
-		mMimeTypes.put(extension, mimetype);
-	}
-	
+    public MimeTypes fromXmlResource(XmlResourceParser in)
+            throws XmlPullParserException, IOException {
+        mXpp = in;
+
+        return parse();
+    }
+
+    public MimeTypes parse()
+            throws XmlPullParserException, IOException {
+
+        mMimeTypes = new MimeTypes();
+
+        int eventType = mXpp.getEventType();
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+            String tag = mXpp.getName();
+
+            if (eventType == XmlPullParser.START_TAG) {
+                if (tag.equals(TAG_MIMETYPES)) {
+
+                } else if (tag.equals(TAG_TYPE)) {
+                    addMimeTypeStart();
+                }
+            } else if (eventType == XmlPullParser.END_TAG) {
+                if (tag.equals(TAG_MIMETYPES)) {
+
+                }
+            }
+
+            eventType = mXpp.next();
+        }
+
+        return mMimeTypes;
+    }
+
+    private void addMimeTypeStart() {
+        String extension = mXpp.getAttributeValue(null, ATTR_EXTENSION);
+        String mimetype = mXpp.getAttributeValue(null, ATTR_MIMETYPE);
+
+        mMimeTypes.put(extension, mimetype);
+    }
+
 }

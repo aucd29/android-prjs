@@ -16,9 +16,9 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"/>
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
             android:textSize="15sp"
             android:textStyle="bold" />
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:textColor="@android:color/darker_gray"
             android:textSize="12sp" />
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/pkgName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
 
         <!-- android:layout_alignLeft="@+id/name" android:maxWidth="@dimen/list_max" -->
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
         android:layout_marginRight="-160dp"
         android:orientation="horizontal" >
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/sd"
             style="@style/btnLayout"
             android:layout_width="match_parent"
@@ -83,7 +83,7 @@
             android:text="@string/sdcard"
             android:textColor="#ffffff" />
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/email"
             style="@style/btnLayout"
             android:layout_width="match_parent"
@@ -91,7 +91,7 @@
             android:background="@drawable/btn_email_selector"
             android:text="@string/sharing" />
 
-        <net.sarangnamu.common.fonts.RobotoLightTextView
+        <net.sarangnamu.common.RobotoLightTextView
             android:id="@+id/delete"
             style="@style/btnLayout"
             android:layout_width="match_parent"
