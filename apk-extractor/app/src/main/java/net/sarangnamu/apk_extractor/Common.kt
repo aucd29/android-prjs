@@ -49,8 +49,8 @@ fun Drawable.bitmap(config: Bitmap.Config = Bitmap.Config.ARGB_8888): Bitmap {
 
 fun Bitmap.resize(w: Int, h: Int): Bitmap {
     val matrix = Matrix()
-    val scaleW = (w / width).toFloat()
-    val scaleH = (h / height).toFloat()
+    val scaleW = w.toFloat() / width.toFloat()
+    val scaleH = h.toFloat() / height.toFloat()
 
     matrix.postScale(scaleW, scaleH)
 

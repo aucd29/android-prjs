@@ -28,7 +28,7 @@ class AppList private constructor() {
         val get: AppList by lazy { Holder.INSTANCE }
     }
 
-    fun load(activity: Activity, hideSystemApp: Boolean = false): ArrayList<AppInfo> {
+    fun load(hideSystemApp: Boolean = false): ArrayList<AppInfo> {
         val context  = MainApp.context()
         val packages = context.packageManager.getInstalledPackages(0)
         val apps: ArrayList<AppInfo> = ArrayList()
@@ -101,10 +101,12 @@ class ApkRequestHandler (val context: Context) : RequestHandler() {
         }
 
         val bmp: Bitmap
-        val info = context.packageManager.getPackageArchiveInfo(request.uri.path, PackageManager.GET_ACTIVITIES)
-
+        val info = context.packageManager.getPackageArchiveInfo(request.uri.path, 0)
         if (info != null) {
-            bmp = info.applicationInfo.loadIcon(context.packageManager).bitmap()
+            bmp = info.applicationInfo.apply {
+                sourceDir = request.uri.path
+                publicSourceDir = request.uri.path
+            }.loadIcon(context.packageManager).bitmap()
         } else {
             bmp = BitmapFactory.decodeResource(context.resources, R.drawable.ic_photo_library_white_24dp)
         }
@@ -112,7 +114,6 @@ class ApkRequestHandler (val context: Context) : RequestHandler() {
         return Result(bmp.ratioResize(R.dimen.main_icon_size), Picasso.LoadedFrom.DISK)
     }
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 //

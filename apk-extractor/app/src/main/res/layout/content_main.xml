@@ -101,6 +101,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"
         android:drawSelectorOnTop="false"
+        android:visibility="gone"
         />
 
     <net.sarangnamu.common.RobotoLightTextView
@@ -110,5 +111,18 @@
         android:layout_gravity="center|center_vertical"
         android:gravity="center|center_vertical"
         android:singleLine="true"
-        android:text="@string/emptyList"/>
+        android:text="@string/emptyList"
+        android:visibility="gone"
+        />
+
+    <ImageView
+        android:id="@+id/icon_data"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageView
+        android:id="@+id/icon_data2"
+        android:layout_marginLeft="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item.view.*
 import net.sarangnamu.apk_extractor.MainApp
@@ -58,7 +59,7 @@ class AppAdapter(val activity: Activity, val listener: View.OnClickListener) : B
                 pkgName.text = it.packageName
                 version.text = it.versionName?.let { "($it)" } ?: ""
 
-                picasso.load("icon://" + it.path).into(icon)
+                picasso.load("icon://" + it.path).memoryPolicy(MemoryPolicy.NO_CACHE).into(icon)
 
                 sd.tag     = PosHolder(position, ET_SDCARD, row)
                 email.tag  = PosHolder(position, ET_EMAIL, row)
