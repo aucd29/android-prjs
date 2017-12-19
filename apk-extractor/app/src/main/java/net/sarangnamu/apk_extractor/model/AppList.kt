@@ -1,12 +1,10 @@
 package net.sarangnamu.apk_extractor.model
 
-import android.app.Activity
 import android.content.pm.ApplicationInfo
 import com.squareup.picasso.Picasso
 import net.sarangnamu.common.toFileSizeString
 import java.io.File
 import android.graphics.Bitmap
-import android.content.pm.PackageManager
 import android.content.Context
 import android.graphics.BitmapFactory
 import com.squareup.picasso.Request
@@ -96,10 +94,6 @@ class ApkRequestHandler (val context: Context) : RequestHandler() {
     }
 
     override fun load(request: Request, networkPolicy: Int): Result {
-        if (log.isDebugEnabled) {
-            log.debug("request uri : ${request.uri.path}")
-        }
-
         val bmp: Bitmap
         val info = context.packageManager.getPackageArchiveInfo(request.uri.path, 0)
         if (info != null) {

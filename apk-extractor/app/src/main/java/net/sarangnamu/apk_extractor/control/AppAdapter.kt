@@ -13,6 +13,7 @@ import net.sarangnamu.apk_extractor.R
 import net.sarangnamu.apk_extractor.model.ApkRequestHandler
 import net.sarangnamu.common.displayDensity
 import net.sarangnamu.common.dpToPixel
+import net.sarangnamu.common.trycatch
 
 /**
  * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2017. 12. 5.. <p/>
@@ -59,7 +60,8 @@ class AppAdapter(val activity: Activity, val listener: View.OnClickListener) : B
                 pkgName.text = it.packageName
                 version.text = it.versionName?.let { "($it)" } ?: ""
 
-                picasso.load("icon://" + it.path).memoryPolicy(MemoryPolicy.NO_CACHE).into(icon)
+                //memoryPolicy(MemoryPolicy.NO_CACHE).
+                picasso.load("icon://" + it.path).into(icon)
 
                 sd.tag     = PosHolder(position, ET_SDCARD, row)
                 email.tag  = PosHolder(position, ET_EMAIL, row)
@@ -71,14 +73,7 @@ class AppAdapter(val activity: Activity, val listener: View.OnClickListener) : B
         return view
     }
 
-    override fun getCount(): Int {
-        try {
-            return DataManager.get.listAll().size
-        } catch (e: Exception) {
-            return 0
-        }
-    }
-
+    override fun getCount(): Int = try { DataManager.get.listAll().size } catch (e: Exception) { 0 }
     override fun getItem(position: Int): Any? = null
     override fun getItemId(position: Int): Long = 0
 }

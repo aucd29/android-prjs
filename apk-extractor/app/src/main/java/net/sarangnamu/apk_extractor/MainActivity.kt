@@ -50,20 +50,6 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // test code FIXME
-        val apkPath = "/data/app/com.hanwhalife.fpdeudev-2/base.apk"
-        val info = packageManager.getPackageArchiveInfo(apkPath, 0)
-        val icon = info.applicationInfo.apply {
-            sourceDir = apkPath
-            publicSourceDir = apkPath
-        }.loadIcon(packageManager)
-
-        val bmp = icon.bitmap()
-
-        icon_data.setImageDrawable(icon)
-        icon_data2.setImageBitmap(bmp.ratioResize(R.dimen.main_icon_size))
-
-
         initLabel()
         initDownloadPath()
         initMenu()

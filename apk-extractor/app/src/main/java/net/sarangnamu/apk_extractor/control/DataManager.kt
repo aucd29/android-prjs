@@ -34,6 +34,10 @@ class DataManager private constructor() {
     fun load(activity: Activity) {
         val data = AppList.get.load()
         appList[MODE] = data
+
+        if (log.isDebugEnabled) {
+            log.debug("LOAD APPS COUNT:(${data.size}), MODE($MODE) ")
+        }
     }
 
     fun toggleMode() { MODE = if (MODE == NORMAL) SEARCHED else NORMAL }
