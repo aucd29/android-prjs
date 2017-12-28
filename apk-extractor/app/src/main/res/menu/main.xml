@@ -1,46 +1,47 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/mnu_search"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_search"/>
+        android:title="@string/mnu_search"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/mnu_search_from_mirror"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_search_from_mirror"/>
+        android:title="@string/mnu_search_from_mirror"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/mnu_showSystemApp"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_showAllApps"/>
+        android:title="@string/mnu_showAllApps"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/mnu_setSdPath"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_setSdPath"/>
-    <!--<item-->
-        <!--android:id="@+id/mnu_email"-->
-        <!--android:orderInCategory="100"-->
-        <!--android:showAsAction="never"-->
-        <!--android:title="@string/mnu_email"/>-->
+        android:title="@string/mnu_setSdPath"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/mnu_sortBy"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_sortBy"/>
+        android:title="@string/mnu_sortBy"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/mnu_specialThanks"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_specialThanks"/>
+        android:title="@string/mnu_specialThanks"
+        app:showAsAction="never"/>
     <item
         android:id="@+id/mnu_license"
         android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/mnu_license"/>
+        android:title="@string/mnu_license"
+        app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/mnu_donation"
+        android:orderInCategory="100"
+        android:title="@string/mnu_donation"
+        app:showAsAction="never"/>
 </menu>

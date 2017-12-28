@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/create_dir_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp" >
 
-    <net.sarangnamu.common.fonts.RobotoLightTextView
+    <net.sarangnamu.common.RobotoLightTextView
         style="@style/fileChooserName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

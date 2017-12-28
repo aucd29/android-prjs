@@ -31,7 +31,7 @@ class DataManager private constructor() {
         appList.add(ArrayList())
     }
 
-    fun load(activity: Activity) {
+    fun load() {
         val data = AppList.get.load()
         appList[MODE] = data
 

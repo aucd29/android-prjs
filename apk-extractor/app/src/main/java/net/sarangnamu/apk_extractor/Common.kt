@@ -4,9 +4,12 @@ import android.animation.Animator
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -14,19 +17,23 @@ import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.os.AsyncTask
 import android.os.Build
 import android.support.annotation.ColorRes
 import android.support.annotation.DimenRes
+import android.support.annotation.StringRes
 import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.text.Spanned
-import android.view.MenuItem
-import android.view.View
-import android.view.Window
-import android.view.WindowManager
+import android.util.Base64
+import android.util.Log
+import android.view.*
+import android.widget.FrameLayout
 import android.widget.PopupMenu
 import kotlinx.android.synthetic.main.activity_web.*
 import net.sarangnamu.apk_extractor.control.string
+import net.sarangnamu.common.DialogParam
+import net.sarangnamu.common.addEndListener
 import net.sarangnamu.common.*
 
 /**
@@ -158,13 +165,59 @@ inline fun String.html(): Spanned {
     }
 }
 
-inline fun Activity.showLicense2(path: String = "file:///android_asset/license.html") {
+inline fun Activity.browser(url: String, @StringRes titleId: Int = 0) {
     dialog(DialogParam().apply {
-        resid = R.layout.dlg_license
+        resid = R.layout.activity_web
+        textOnly = true
+        if (titleId != 0) {
+            title = string(titleId)
+        }
     }).show().run {
-        //title.roboto()
-        web.loadUrl(path)
+        web.loadUrl(url)
+        web.layoutParams = FrameLayout.LayoutParams(MainApp.screenX(), MainApp.screenY())
+
         fullscreen()
-        show()
     }
+}
+
+inline fun Dialog.fullscreen() {
+    window.run {
+        val attr = attributes
+        attr.run {
+            width  = WindowManager.LayoutParams.MATCH_PARENT
+            height = WindowManager.LayoutParams.MATCH_PARENT
+        }
+        attributes = attr
+
+        setBackgroundDrawableResource(android.R.color.transparent)
+    }
+}
+
+fun Activity.async(background: (() -> Boolean)? = null, post: ((result: Boolean) -> Unit)? = null) {
+    Async(background, post).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
+fun Context.async(background: (() -> Boolean)? = null, post: ((result: Boolean) -> Unit)? = null) {
+    Async(background, post).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+}
+
+internal class Async(val background: (() -> Boolean)?, val post: ((result: Boolean) -> Unit)?)
+    : AsyncTask<Void, Void, Boolean>() {
+    override fun doInBackground(vararg params: Void?): Boolean {
+        return background?.invoke() ?: true
+    }
+
+    override fun onPostExecute(result: Boolean) {
+        post?.invoke(result)
+    }
+}
+
+fun Context.clipboard(key: String): String? {
+    val manager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    return manager.primaryClip?.getItemAt(0)?.text.toString()
+}
+
+fun Context.clipboard(key: String, value: String?) {
+    val manager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    manager.primaryClip = ClipData.newPlainText(key, value)
 }

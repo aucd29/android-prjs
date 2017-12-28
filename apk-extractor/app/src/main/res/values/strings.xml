@@ -33,5 +33,9 @@
     <string name="mnu_specialThanks">Special Thanks</string>
     <string name="mnu_license">License</string>
     <string name="mnu_sortBy">Sort By</string>
+    <string name="mnu_donation">Donation</string>
 
+    <!-- dlg donation -->
+    <string name="dlg_copy_addr">Copy Address</string>
+    <string name="dlg_copied_addr">Copied Address</string>
 </resources>

@@ -5,15 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.item.view.*
 import net.sarangnamu.apk_extractor.MainApp
 import net.sarangnamu.apk_extractor.R
 import net.sarangnamu.apk_extractor.model.ApkRequestHandler
 import net.sarangnamu.common.displayDensity
-import net.sarangnamu.common.dpToPixel
-import net.sarangnamu.common.trycatch
 
 /**
  * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2017. 12. 5.. <p/>

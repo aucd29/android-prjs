@@ -3,8 +3,6 @@ package net.sarangnamu.apk_extractor
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -17,8 +15,10 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.BaseAdapter
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_web.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.content_main.view.*
+import kotlinx.android.synthetic.main.dlg_donation.*
 import kotlinx.android.synthetic.main.dlg_sortby.*
 import kotlinx.android.synthetic.main.dlg_timer.*
 import net.sarangnamu.apk_extractor.control.*
@@ -61,13 +61,16 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
     fun initLabel() {
         val developer = String.format("<b>%s</b> <a href='http://sarangnamu.net'>@aucd29</a>", string(R.string.dev))
 
-        main_title.text   = string(R.string.appName)!!.html()
+        main_title.text   = string(R.string.appName)?.html()
         main_dev.text     = developer.html()
         main_progress.max = 100
     }
 
     fun initDownloadPath() {
         val path = String.format("<b>%s</b> : %s", string(R.string.downloadPath), Cfg.downloadPath().replace(sdPath(), "/sdcard"))
+        if (log.isDebugEnabled) {
+            log.debug("INIT DOWNLOAD DIR : $path")
+        }
         main_path.text = path.html()
     }
 
@@ -86,13 +89,19 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             ACTIVITY_EXPLORER -> {
-                val path = intent.getStringExtra("path")
-                path?.let {
-                    Cfg.set(Cfg.USERPATH, it)
-                    initDownloadPath()
+                if (resultCode == Activity.RESULT_OK) {
+                    val path = data?.getStringExtra("path")
+                    path?.let {
+                        if (log.isDebugEnabled) {
+                            log.debug("SET DOWNLOAD DIR : $it")
+                        }
+
+                        Cfg.set(Cfg.USERPATH, it)
+                        initDownloadPath()
+                    }
                 }
             }
             ACTIVITY_SHARE -> {
@@ -118,6 +127,41 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
         return super.onKeyUp(keyCode, event)
     }
 
+    override fun onBackPressed() {
+        val manager = DataManager.get
+        if (manager.MODE == DataManager.SEARCHED) {
+            manager.removeSearchedList()
+            updateList()
+
+            if (main_search.visibility != View.GONE) {
+                changeSearchUi()
+            }
+
+            return
+        } else if (main_search.visibility != View.GONE) {
+            changeSearchUi()
+
+            return
+        } else if (list.isShowMenu) {
+            list.hide()
+
+            return
+        }
+
+        super.onBackPressed()
+    }
+
+    override fun onPause() {
+        hideKeyboard(main_search)
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // FIXME
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     //
     // MENU
@@ -130,14 +174,15 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
 
             MenuManager.get.show(this, v, menu, { item ->
                 when (item!!.itemId) {
-                    R.id.mnu_search -> changeSearchUi()
+                    R.id.mnu_search             -> changeSearchUi()
                     R.id.mnu_search_from_mirror -> searchFromMirror()
-                    R.id.mnu_license -> showLicense()
-                    R.id.mnu_setSdPath -> fileExplorer()
-                    R.id.mnu_showSystemApp -> loadSystemApp()
-                    R.id.mnu_showInstalledApp -> loadInstalledApp()
-                    R.id.mnu_specialThanks -> showLicense2("file:///android_assets/special_thanks.html")
-                    R.id.mnu_sortBy -> sortBy()
+                    R.id.mnu_license            -> browser("file:///android_asset/license.html")
+                    R.id.mnu_setSdPath          -> fileExplorer()
+                    R.id.mnu_showSystemApp      -> loadSystemApp()
+                    R.id.mnu_showInstalledApp   -> loadInstalledApp()
+                    R.id.mnu_specialThanks      -> browser("file:///android_asset/speical_thanks.html")
+                    R.id.mnu_sortBy             -> sortBy()
+                    R.id.mnu_donation           -> donation()
                 }
 
                 false
@@ -170,22 +215,25 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
 
     fun sortBy() {
         val dialog = dialog(DialogParam().apply {
-            title = string(R.string.mnu_sortBy)
             resid = R.layout.dlg_sortby
+            textOnly = true
         })
 
         val dlg = dialog.show()
-        val sortby = Cfg.get(Cfg.SORT_BY)
-        AdMob.get.load(dlg, R.id.adView)
+        val sortby = Cfg.get(Cfg.SORT_BY, Cfg.SORT_LAST_INSTALL_TIME)
 
-        when (sortby) {
-            Cfg.SORT_ALPHABET_ASC       -> { alphabetAsc.isChecked = true }
-            Cfg.SORT_ALPHABET_DESC      -> { alphabetDesc.isChecked = true }
-            Cfg.SORT_FIRST_INSTALL_TIME -> { firstInstallTime.isChecked = true }
-            Cfg.SORT_LAST_INSTALL_TIME  -> { lastInstallTime.isChecked = true }
+        if (log.isDebugEnabled) {
+            log.debug("CURRENT ORDER BY : ${sortby}")
         }
 
-        sortGroup.setOnCheckedChangeListener { group, checkedId ->
+        when (sortby) {
+            Cfg.SORT_ALPHABET_ASC       -> dlg.sortGroup.check(R.id.alphabetAsc)
+            Cfg.SORT_ALPHABET_DESC      -> dlg.sortGroup.check(R.id.alphabetDesc)
+            Cfg.SORT_FIRST_INSTALL_TIME -> dlg.sortGroup.check(R.id.firstInstallTime)
+            Cfg.SORT_LAST_INSTALL_TIME  -> dlg.sortGroup.check(R.id.lastInstallTime)
+        }
+
+        dlg.sortGroup.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.alphabetAsc      -> Cfg.set(Cfg.SORT_BY, Cfg.SORT_ALPHABET_ASC)
                 R.id.alphabetDesc     -> Cfg.set(Cfg.SORT_BY, Cfg.SORT_ALPHABET_DESC)
@@ -196,7 +244,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
             dlg.dismiss()
         }
 
-        sortGroup.font("Roboto-Light")
+        dlg.sort_layout.font("Roboto-Light")
     }
 
     ////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +265,7 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
         })
-        main_search.setOnEditorActionListener { v, actionId, event ->
+        main_search.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 changeSearchUi()
             }
@@ -268,7 +316,10 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
         val loading = loading(DialogParam(this@MainActivity, R.string.plsWait), false)
         loading.show()
 
-        LoadTask(WeakReference(this@MainActivity), {
+        async ({
+            DataManager.get.load()
+            true
+        }, {
             if (reload) {
                 initList()
             } else {
@@ -276,20 +327,11 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
                 updateList()
             }
 
-            loading.hide()
-        }).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }
-
-    class LoadTask(val weak: WeakReference<Activity>, val endListener: (result: Boolean) -> Unit)
-        : AsyncTask<Void, Void, Boolean>() {
-        override fun doInBackground(vararg params: Void?): Boolean {
-            DataManager.get.load(weak.get()!!)
-            return true
-        }
-
-        override fun onPostExecute(result: Boolean) {
-            endListener.invoke(result)
-        }
+            if (log.isDebugEnabled) {
+                log.debug("HIDE LOADING")
+            }
+            loading.dismiss()
+        })
     }
 
     fun initList() {
@@ -371,5 +413,29 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
         }, 1000)
 
         dlg.msg.text = string(msgId)
+    }
+
+    fun license(url: String) {
+        browser(url)
+    }
+
+    fun donation() {
+        dialog(DialogParam().apply {
+            title = string(R.string.mnu_donation)
+            resid = R.layout.dlg_donation
+            textOnly = true
+        }).show().run {
+            AdMob.get.load(this, R.id.adView)
+            copy_address.setOnClickListener {
+                // clipboard event
+                clipboard("eth-addr", eth_addr.text.toString())
+
+                var str = string(R.string.dlg_copied_addr)
+                str += "\n"
+                str += clipboard("eth-addr")
+
+                toast(str!!).show()
+            }
+        }
     }
 }

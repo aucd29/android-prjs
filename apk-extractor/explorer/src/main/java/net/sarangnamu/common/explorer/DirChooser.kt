@@ -8,8 +8,9 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.content.Loader
 import android.text.TextUtils
-import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import com.ipaulpro.afilechooser.FileChooserActivity
 import com.ipaulpro.afilechooser.FileListFragment
@@ -17,6 +18,7 @@ import com.ipaulpro.afilechooser.FileLoader
 import com.ipaulpro.afilechooser.utils.FileUtils
 import kotlinx.android.synthetic.main.dir_chooser.*
 import kotlinx.android.synthetic.main.dlg_create_dir.view.*
+import org.slf4j.LoggerFactory
 import java.io.File
 
 /**
@@ -24,17 +26,27 @@ import java.io.File
  */
 
 class DirChooserActivity : FileChooserActivity() {
+    private val log = LoggerFactory.getLogger(DirChooserActivity::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        userFont(layout)
+        userFont(explorer_layout)
 
         createDir.setOnClickListener {
             val view = layoutInflater.inflate(R.layout.dlg_create_dir, null)
+            userFont(view.create_dir_layout)
 
             AlertDialog.Builder(this@DirChooserActivity).setView(view)
                 .setPositiveButton(android.R.string.yes, { _, _ ->
-                    val data = view.edit.toString()
+                    keyboard(view.edit, false)
+
+                    val data = view.edit.text.toString()
+
+                    if (log.isDebugEnabled) {
+                        log.debug("CREATE DIR : $data")
+                    }
+
                     if (TextUtils.isEmpty(data)) {
                         return@setPositiveButton
                     }
@@ -48,19 +60,18 @@ class DirChooserActivity : FileChooserActivity() {
                 })
                 .setNegativeButton(android.R.string.no, null)
                 .show()
+
+            keyboard(view.edit, true)
         }
 
         setPath.setOnClickListener {
-            val view = TextView(this@DirChooserActivity)
-            with (view) {
-                setText(R.string.setCurrentDir)
-                gravity = Gravity.CENTER or Gravity.CENTER_VERTICAL
-                setPadding(0, dpToPixel(15), 0, 0)
-            }
-
-            AlertDialog.Builder(this@DirChooserActivity).setView(view)
+            AlertDialog.Builder(this@DirChooserActivity).setMessage(R.string.setCurrentDir)
                 .setNegativeButton(android.R.string.no, null)
                 .setPositiveButton(android.R.string.yes, { _, _ ->
+                    if (log.isDebugEnabled) {
+                        log.debug("CHOOSE DIR : $mPath")
+                    }
+
                     setResult(Activity.RESULT_OK, Intent().apply { putExtra("path", mPath) })
                     finish()
                 })
@@ -68,9 +79,37 @@ class DirChooserActivity : FileChooserActivity() {
         }
     }
 
+    override fun getContentLayoutId(): Int = R.layout.dir_chooser
+
     override fun instListFragment(): FileListFragment = DirListFrgmt.newInstance(mPath)
 
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_CANCELED)
+        super.onBackPressed()
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    //
+    // USER
+    //
+    ////////////////////////////////////////////////////////////////////////////////////
+
     private fun dpToPixel(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    private fun keyboard(view: View, show: Boolean) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        view.run {
+            if (show) {
+                postDelayed({
+                    requestFocus()
+                    imm.showSoftInput(this, InputMethodManager.SHOW_FORCED)
+                }, 400)
+            } else {
+                imm.hideSoftInputFromWindow(windowToken, 0)
+            }
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////
     //
@@ -81,12 +120,11 @@ class DirChooserActivity : FileChooserActivity() {
     private fun userFont(vgroup: ViewGroup) {
         val count = vgroup.childCount
         (0..count - 1).map {
-            val view = layout.getChildAt(it)
+            val view = vgroup.getChildAt(it)
 
-            if (view is TextView) {
-                view.typeface = roboto()
-            } else if (view is ViewGroup) {
-                userFont(view)
+            when (view) {
+                is TextView -> view.typeface = roboto()
+                is ViewGroup -> userFont(view)
             }
         }
     }

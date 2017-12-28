@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import net.sarangnamu.apk_extractor.MainActivity
+import net.sarangnamu.apk_extractor.model.Preference
 import net.sarangnamu.apk_extractor.model.pref
-import net.sarangnamu.common.Preference
 import net.sarangnamu.common.isForegroundApp
 import org.slf4j.LoggerFactory
 

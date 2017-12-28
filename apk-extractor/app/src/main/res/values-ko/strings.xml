@@ -18,7 +18,11 @@
     <string name="mnu_showAllApps">모든 앱 보기</string>
     <string name="mnu_showInstalledApps">설치된 앱 보기</string>
     <string name="mnu_setSdPath">앱 경로 지정</string>
-    <string name="mnu_license">라이센스</string>
+    <string name="mnu_license">라이선스</string>
     <string name="mnu_sortBy">정렬</string>
-    <string name="mnu_specialThanks">고마운분들</string>
+    <string name="mnu_specialThanks">번역</string>
+    <string name="mnu_donation">기부</string>
+
+    <string name="dlg_copy_addr">주소 복사</string>
+    <string name="dlg_copied_addr">복사 되었습니다. </string>
 </resources>

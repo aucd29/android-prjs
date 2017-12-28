@@ -1,11 +1,11 @@
 package net.sarangnamu.apk_extractor.model
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Environment
+import android.util.Base64
 import net.sarangnamu.apk_extractor.MainApp
-import net.sarangnamu.common.Preference
 import net.sarangnamu.common.addLastSlash
-import net.sarangnamu.common.config
 
 /**
  * Created by <a href="mailto:aucd29@gmail.com">Burke Choi</a> on 2017. 11. 30.. <p/>
@@ -41,9 +41,54 @@ class Cfg {
     }
 }
 
-inline fun Context.pref(param: Preference): String? {
-    return config(param)
-}
-
 inline fun Context.sdPath() =
         Environment.getExternalStorageDirectory().getAbsolutePath()
+
+@SuppressLint("CommitPrefEdits")
+inline fun Context.pref(param: Preference): String? {
+    val pref = getSharedPreferences("shared.pref", Context.MODE_PRIVATE)
+
+    if (param.write) {
+        // write mode
+        val editor = pref.edit().putString(param.key, param.value)
+        if (param.async) {
+            editor.apply()
+        } else {
+            editor.commit()
+        }
+    } else {
+        // read mode
+        val value = pref.getString(param.key, param.value)
+        return value?.let { String(Base64.decode(it, Base64.DEFAULT)) } ?: value
+    }
+
+    return null
+}
+
+class Preference {
+    lateinit var key: String
+    var value: String? = null
+    var write = false
+    var async = false
+
+    /**
+     * read shared preference
+     */
+    fun read(key: String, value: String?) {
+        data(key, value)
+        write = false
+    }
+
+    /**
+     * write shared preference
+     */
+    fun write(key: String, value: String?) {
+        data(key, value)
+        write = true
+    }
+
+    private fun data(key: String, value: String?) {
+        this.key = key
+        this.value = value?.let { Base64.encodeToString(it.toByteArray(), Base64.DEFAULT) } ?: value
+    }
+}
